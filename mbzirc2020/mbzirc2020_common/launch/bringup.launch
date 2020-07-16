@@ -20,6 +20,14 @@
   <arg name="rviz_config_path" default="$(find hydrus)/config/rviz_config"/>
   <arg name="robot_ns" value="hydrus$(arg robot_id)" />
 
+  ###########  Sensors  ###########
+  <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
+    <arg name="robot_ns" value="$(arg robot_ns)" />
+  </include>
+
   ###########  Parameters  ###########
   <group ns="$(arg robot_ns)">
 
@@ -70,16 +78,8 @@
     <arg name="model_options" value="horizontal_vio:=$(arg horizontal_vio)" />
     <arg name="rviz_config" value="$(arg rviz_config_path)"/>
     <arg name="rviz_init_pose" value="$(find mbzirc2020_common)/config/RvizInit.yaml" />
-    <arg name="need_joint_state" value="false" if ="$(eval arg('simulation') + arg('real_machine'))"/>
+    <arg name="need_joint_state" value="false" if ="$(eval arg('simulation') or arg('real_machine'))"/>
   </include>
-
-  ###########  Sensors  ###########
-  <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
-    <arg name="real_machine" value="$(arg real_machine)" />
-    <arg name="simulation" value="$(arg simulation)" />
-    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
-    <arg name="robot_ns" value="$(arg robot_ns)" />
-  </include >
 
   ###########  Servo Bridge  ###########
   <node pkg="aerial_robot_model" type="servo_bridge_node" name="servo_bridge"  output="screen"  ns="$(arg robot_ns)" />
