@@ -19,6 +19,7 @@
   <arg name="config_path" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/config/$(arg model_suffix)"/>
   <arg name="rviz_config_path" default="$(find hydrus)/config/rviz_config"/>
   <arg name="robot_ns" value="hydrus$(arg robot_id)" />
+  <arg name="use_vio" default="true"/>
 
   ###########  Sensors  ###########
   <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
@@ -27,6 +28,7 @@
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
     <arg name="robot_id" value="$(arg robot_id)" if="$(eval arg('robot_id') != '')" />
+    <arg name="use_vio" value="$(arg use_vio)"/>
   </include>
 
   ###########  Parameters  ###########
