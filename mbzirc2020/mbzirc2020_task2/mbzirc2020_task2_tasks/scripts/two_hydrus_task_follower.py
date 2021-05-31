@@ -22,8 +22,11 @@ class Task2State(smach.State):
 
         self.manager_state = ""
 
-        self.simulation = rospy.get_param('~simulation')
-        self.outdoor = rospy.get_param('~outdoor')
+        self.simulation = rospy.get_param('/simulation')
+        self.outdoor = rospy.get_param('/outdoor')
+        self.skip_pick = rospy.get_param('/skip_pick')
+
+        self.ft_sensor_feedback = rospy.get_param('~ft_sensor_feedback')
 
         self.robot = robot
 
@@ -40,7 +43,7 @@ class Task2State(smach.State):
 
 class Start(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['skip_pick', 'entire_task'])
 
     def execute(self, userdata):
 
@@ -48,6 +51,61 @@ class Start(Task2State):
             rospy.sleep(0.1)
 
         self.robot.saveInitialPosition()
+
+        self.publish_state()
+
+        if self.skip_pick:
+            return 'skip_pick'
+
+        return 'entire_task'
+
+class FollowerTakeoff(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class FollowerApproachPickArea(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class FollowerAdjustPickPosition(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class FollowerLanding(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
 
         self.publish_state()
 
@@ -65,7 +123,8 @@ class Grasp(Task2State):
         #self.robot.grasp()
 
         if not self.simulation:
-            self.robot.add_long_object_to_model(action="add")
+            #self.robot.add_long_object_to_model(action="add")
+            pass
 
         self.publish_state()
 
@@ -114,14 +173,16 @@ class ChangeHeight(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.goVel('local', [0.1,-0.1], None, None)
+    
+        #for _ in range(5):
+        #    self.robot.goVel('local', [0.0707,-0.0707], None, None)
 
         if self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 15000)
+            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 40000)
         elif not self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 1.0, None, gps_mode=False, time = 5000)
+            self.robot.goPosHeightInterpolation('global', None, 1.2, None, gps_mode=False, time = 5000)
 
-        self.robot.goVel('local', [0.0,0.0], None, None)
+        #self.robot.goVel('local', [0.0,0.0], None, None)
 
         self.publish_state()
 
@@ -136,9 +197,9 @@ class EnablePlaneDetection(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.enable_plane_detection(flag = True)
+        #self.robot.enable_plane_detection(flag = True)
 
-        self.robot.enable_alt_sensor(flag = False)
+        #self.robot.enable_alt_sensor(flag = False)
 
         self.publish_state()
 
@@ -153,7 +214,10 @@ class FollowerNavigated(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.change_ctrl_mode(mode='vel')
+        if self.ft_sensor_feedback:
+            self.robot.ft_sensor_feedback_switch(flag=True)
+        else:
+            self.robot.change_ctrl_mode(mode='vel')
 
         self.publish_state()
 
@@ -168,7 +232,8 @@ class SetYawFree(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.set_yaw_free(flag=True)
+        if not self.ft_sensor_feedback:
+            self.robot.set_yaw_free(flag=True)
 
         self.publish_state()
 
@@ -187,6 +252,9 @@ class FollowerApproachPlacePosition(Task2State):
 
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
+
+        if self.ft_sensor_feedback:
+            self.robot.ft_sensor_feedback_switch(flag=False)
 
         if self.outdoor:
             baselink_pos = self.robot.getBaselinkPos()[0:2]
@@ -280,7 +348,7 @@ class AdjustHeight(Task2State):
         if self.outdoor:
             self.robot.goPosHeightInterpolation('global', None, 2.3, None, gps_mode=False, time = 10000)
         elif not self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 0.75, None, gps_mode=False, time = 10000)
+            self.robot.goPosHeightInterpolation('global', None, 0.9, None, gps_mode=False, time = 2000)
 
         self.publish_state()
 
@@ -399,6 +467,19 @@ def main():
 
     with sm_top:
         smach.StateMachine.add('Start', Start(hydrus),
+                               transitions={'entire_task':'FollowerTakeoff',
+                                            'skip_pick':'Takeoff'})
+
+        smach.StateMachine.add('FollowerTakeoff', FollowerTakeoff(hydrus),
+                               transitions={'succeeded':'FollowerApproachPickArea'})
+
+        smach.StateMachine.add('FollowerApproachPickArea', FollowerApproachPickArea(hydrus),
+                               transitions={'succeeded':'FollowerAdjustPickPosition'})
+
+        smach.StateMachine.add('FollowerAdjustPickPosition', FollowerAdjustPickPosition(hydrus),
+                               transitions={'succeeded':'FollowerLanding'})
+
+        smach.StateMachine.add('FollowerLanding', FollowerLanding(hydrus),
                                transitions={'succeeded':'Grasp'})
 
         smach.StateMachine.add('Grasp', Grasp(hydrus),

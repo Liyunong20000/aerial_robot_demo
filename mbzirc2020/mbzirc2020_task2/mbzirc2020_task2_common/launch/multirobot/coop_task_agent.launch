@@ -7,14 +7,17 @@
   <arg name="real_machine" default="True" />
   <arg name="headless" default="True" />
   <arg name="launch_gazebo" default="False" />
-  <arg name="outdoor" default="true" />
   <arg name="passive_gripper" default="False" />
   <arg name="ring_gripper" default="False" />
   <arg name="ball_joint_gripper" default="False" />
-  <arg name="estimate_mode"  default= "0" />
+  <arg name="outdoor" default="true" />
+  <arg name="estimate_mode" default="0" if="$(arg outdoor)"/>
+  <arg name="estimate_mode" default="1" unless="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="True" if="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="False" unless="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa" />
   <arg name="recognition" default="true" />
-  <arg name="ft_sensor_feedback" default="true" />
+  <arg name="ft_sensor_feedback" default="false" />
   <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
   <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)"/>
   <arg name="object_color" default="red" />
@@ -39,6 +42,7 @@
     <arg name="launch_gazebo" value="$(arg launch_gazebo)"/>
     <arg name="headless" value="$(arg headless)"/>
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="rtk_gps"  value= "$(arg rtk_gps)" />
     <arg name="ball_joint_gripper" value="True"/>
     <arg name="worldtype" value="$(arg worldtype)"/>
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
@@ -49,20 +53,34 @@
   </include>
 
   # cfs sensor
-  <include file="$(find mbzirc2020_task2_common)/launch/two_tf_sensors.launch" if="$(eval real_machine=='true' and ft_sensor_feedback=='true')"/>
+  <group ns="$(arg robot_ns)">
+    <include file="$(find mbzirc2020_task2_common)/launch/two_tf_sensors.launch" if="$(eval arg('real_machine') and arg('ft_sensor_feedback'))"/>
+  </group>
 
   <param name="/$(arg robot_ns)/tf_prefix" value="$(arg robot_ns)"/>
 
-  # if follower, navigate hydrus by ft_sensor
-  <node name="ft_sensor_feedback_navigation"
-        pkg="mbzirc2020_task2_common"
-        type="ft_sensor_feedback_navigation.py" 
-        output="screen" 
-        if="$(arg ft_sensor_feedback)"> 
-    <param name="robot_ns" value="$(arg robot_ns)"/> 
-    <param name="sensor_takeoff" value="$(arg sensor_takeoff)"/>
-    <param name="sensor_landing" value="$(arg sensor_landing)"/>
-  </node>
+  # convert simulation sensor topic into real sensor topic
+  <group ns="$(arg robot_ns)">
+    <node name="ft_sensor_calib" 
+          pkg="mbzirc2020_task2_tasks" 
+          type="ft_sensor_calib.py" 
+          output="screen" 
+          if="$(arg simulation)" />
+  </group>
+
+  # ft_sensor node
+  <group ns="$(arg robot_ns)">
+    <node name="ft_sensor_feedback_navigation"
+          pkg="mbzirc2020_task2_common"
+          type="ft_sensor_feedback_navigation.py" 
+          output="screen" 
+          if="$(arg ft_sensor_feedback)"> 
+      <param name="robot_ns" value="$(arg robot_ns)"/> 
+      <param name="sensor_takeoff" value="$(arg sensor_takeoff)"/>
+      <param name="sensor_landing" value="$(arg sensor_landing)"/>
+      <rosparam command="load" file="$(find mbzirc2020_task2_common)/config/_ball_joint_gripper/FTSensorFeedbackConfig.yaml"/>
+    </node>
+  </group>
 
   # recognition
   <group ns="$(arg robot_ns)">
@@ -85,9 +103,8 @@
       <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
       <rosparam command="load" file="$(arg config_dir)/$(arg model)/Grasp.yaml"/>
       <param name="robot_ns" value="$(arg robot_ns)"/> 
-      <param name="simulation" value="$(arg simulation)" />
-      <param name="outdoor" value="$(arg outdoor)" />
+      <param name="ft_sensor_feedback" value="$(arg ft_sensor_feedback)" />
     </node>
-    </group>
+  </group>
 
 </launch>

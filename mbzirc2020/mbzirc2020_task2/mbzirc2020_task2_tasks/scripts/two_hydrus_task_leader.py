@@ -10,6 +10,7 @@ import smach_ros
 import tf2_ros
 
 from std_msgs.msg import Empty, String
+from geometry_msgs.msg import Transform, Inertia, PoseArray, Quaternion, PoseStamped, Pose
 
 from task2_hydrus_interface import Task2HydrusInterface
 
@@ -21,8 +22,18 @@ class Task2State(smach.State):
 
         self.manager_state = ""
 
-        self.simulation = rospy.get_param('~simulation')
-        self.outdoor = rospy.get_param('~outdoor')
+        self.simulation = rospy.get_param('/simulation')
+        self.outdoor = rospy.get_param('/outdoor')
+        self.skip_pick = rospy.get_param('/skip_pick')
+
+        self.grasping_yaw_in_fc = rospy.get_param('~grasping_yaw_in_fc')
+        self.global_object_yaw = rospy.get_param('~global_object_yaw')
+        self.global_lookdown_pos_gps = rospy.get_param('~global_lookdown_pos_gps')
+
+        self.scan_area_velocity = rospy.get_param('~scan_area_velocity')
+        self.scan_area_length = rospy.get_param('~scan_area_length')
+        self.scan_area_pos_thre = rospy.get_param('~scan_area_pos_thre')
+        self.scan_rp_thre = rospy.get_param('~scan_rp_thre')
 
         self.robot = robot
 
@@ -39,7 +50,7 @@ class Task2State(smach.State):
 
 class Start(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['skip_pick', 'entire_task'])
 
     def execute(self, userdata):
 
@@ -47,6 +58,128 @@ class Start(Task2State):
             rospy.sleep(0.1)
 
         self.robot.saveInitialPosition()
+
+        self.publish_state()
+
+        if self.skip_pick:
+            return 'skip_pick'
+
+        return 'entire_task'
+
+class LeaderTakeoff(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.robot.startAndTakeoff()
+
+        self.robot.wait_for_hovering()
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class LeaderApproachPickArea(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        target_uav_yaw = self.global_object_yaw - self.grasping_yaw_in_fc
+        self.robot.goPosWaitConvergence('global', self.global_lookdown_pos_gps, None, target_uav_yaw, gps_mode = True, timeout=20, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class LeaderAdjustPickPosition(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'],input_keys=['target_object_pos'],output_keys=['target_object_pos'])
+
+        self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
+        self.object_pose = PoseArray()
+
+    def objectPoseCallback(self, msg):
+        if len(msg.poses) != 0:
+            self.object_pose = msg
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+
+
+        target_x_pos = self.robot.getBaselinkPos()[0] + self.scan_area_length * np.cos(self.global_object_yaw)
+        target_y_pos = self.robot.getBaselinkPos()[1] + self.scan_area_length * np.sin(self.global_object_yaw)
+        self.object_pose = PoseArray() #reset
+
+        r = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            if self.robot.getBaselinkRPY()[0] > self.scan_rp_thre or self.robot.getBaselinkRPY()[1] > self.scan_rp_thre:
+                continue
+            #set target velocity or position
+            diff_pos = np.array([target_x_pos - self.robot.getBaselinkPos()[0], target_y_pos - self.robot.getBaselinkPos()[1]])
+            if np.linalg.norm(diff_pos) > self.scan_area_pos_thre:
+                target_vel = (diff_pos / np.linalg.norm(diff_pos)) * self.scan_area_velocity
+                self.robot.goVel('global', target_vel, None, None)
+            else:
+                self.robot.goPos('global', [target_x_pos, target_y_pos], None, None)
+
+            if len(self.object_pose.poses) != 0:
+                #detect most foreground object
+                object_poses = self.object_pose.poses
+                object_poses = sorted(object_poses, key=lambda x: x.position.y)
+                target_object_pose = object_poses[-1]
+
+                if target_object_pose.position.y < 0:
+                    #if valid object found, do visual servoing
+                    try:
+                        cam_trans = self.robot.getTF(self.object_pose.header.frame_id)
+                        cam_trans = ros_numpy.numpify(cam_trans.transform)
+                    except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                        rospy.logerr(self.__class__.__name__ + ": cannot find camera tf")
+                        return 'failed'
+
+                    object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(target_object_pose))
+                    object_global_x_axis = object_global_coords[0:3, 0]
+                    object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
+                    object_global_pos = tft.translation_from_matrix(object_global_coords)
+                    #uav_target_yaw = object_global_yaw - self.grasping_yaw
+
+                    userdata.target_object_pos = [0, 0, 0]
+                    userdata.target_object_pos[0] = object_global_pos[0]
+                    userdata.target_object_pos[1] = object_global_pos[1]
+                    userdata.target_object_pos[2] = tft.translation_from_matrix(cam_trans)[2] - object_global_pos[2] # distance from object to camera in world frame
+
+                    rospy.logwarn("%s: succeed to find valid object x: %f, y: %f, yaw: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1], object_global_yaw)
+                    self.robot.goVel('global', [0, 0], None, None)
+                    rospy.sleep(0.1)
+                    self.robot.goPosWaitConvergence('global', object_global_pos[0:2], None, None, timeout=10, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+                    return 'succeeded'
+
+                self.object_pose = PoseArray() #reset
+            r.sleep()
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class LeaderLanding(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
 
         self.publish_state()
 
@@ -65,7 +198,8 @@ class Grasp(Task2State):
         #self.robot.grasp()
 
         if not self.simulation:
-            self.robot.add_long_object_to_model(action="add")
+            #self.robot.add_long_object_to_model(action="add")
+            pass
 
         self.publish_state()
 
@@ -114,14 +248,10 @@ class ChangeHeight(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.goVel('local', [0.1,-0.1], None, None)
-
         if self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 15000)
+            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 40000)
         elif not self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 1.0, None, gps_mode=False, time = 5000)
-
-        self.robot.goVel('local', [0.0,0.0], None, None)
+            self.robot.goPosHeightInterpolation('global', None, 1.2, None, gps_mode=False, time = 5000)
 
         self.publish_state()
 
@@ -136,9 +266,9 @@ class EnablePlaneDetection(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.enable_plane_detection(flag = True)
+        #self.robot.enable_plane_detection(flag = True)
 
-        self.robot.enable_alt_sensor(flag = False)
+        #self.robot.enable_alt_sensor(flag = False)
 
         self.publish_state()
 
@@ -289,7 +419,7 @@ class AdjustHeight(Task2State):
         if self.outdoor:
             self.robot.goPosHeightInterpolation('global', None, 2.3, None, gps_mode=False, time = 10000)
         elif not self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 0.75, None, gps_mode=False, time = 10000)
+            self.robot.goPosHeightInterpolation('global', None, 0.9, None, gps_mode=False, time = 2000)
 
         self.publish_state()
 
@@ -408,6 +538,19 @@ def main():
 
     with sm_top:
         smach.StateMachine.add('Start', Start(hydrus),
+                               transitions={'entire_task':'LeaderTakeoff',
+                                            'skip_pick':'Takeoff'})
+
+        smach.StateMachine.add('LeaderTakeoff', LeaderTakeoff(hydrus),
+                               transitions={'succeeded':'LeaderApproachPickArea'})
+
+        smach.StateMachine.add('LeaderApproachPickArea', LeaderApproachPickArea(hydrus),
+                               transitions={'succeeded':'LeaderAdjustPickPosition'})
+
+        smach.StateMachine.add('LeaderAdjustPickPosition', LeaderAdjustPickPosition(hydrus),
+                               transitions={'succeeded':'LeaderLanding'})
+
+        smach.StateMachine.add('LeaderLanding', LeaderLanding(hydrus),
                                transitions={'succeeded':'Grasp'})
 
         smach.StateMachine.add('Grasp', Grasp(hydrus),
