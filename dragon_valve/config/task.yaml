@@ -1,0 +1,32 @@
+# Valve Task Parameters
+
+debug_view: true # for debug in dragon interface (gopos convergence)
+
+valve_type: 3bridges # x in 'xbriges' denotes the number of bridges from the stem center to handle ring.
+valve_pose_topic: /valve/mocap/pose
+
+baselink_name: baselink
+cog_name: cog
+end_effector_name: gripper
+
+joint:
+  conv_thresh: 0.017 # rad
+
+approach:
+  tip_offset: 0.15
+  pos_conv_thresh: 0.08 # m
+  yaw_conv_thresh: 0.1  # rad
+  att_conv_thresh: 0.06 # rad
+
+adjust:
+  tip_offset: 0.02
+  pos_conv_thresh: 0.08 # m
+  yaw_conv_thresh: 0.1  # rad
+  att_conv_thresh: 0.1 # rad
+
+manipulate:
+  angular_velocity: 0.5 # rad/s
+  round_num: 2
+  rate: 20.0 # Hz
+  action: open # workaround to designate the open/close action
+  fixed_traj: true # whether fixed the radius of the manipulating circle trajectory

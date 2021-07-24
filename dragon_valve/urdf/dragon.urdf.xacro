@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="dragon" >
+
+  <xacro:include filename="$(find dragon)/robots/quad/euclid_201709.urdf.xacro" />
+
+  <joint name="gripper_joint" type="fixed">
+    <parent link="link1"/>
+    <child link="gripper"/>
+    <origin rpy="0 0 ${pi}" xyz="0.01 0.0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <link name="gripper">
+    <!-- <visual> -->
+    <!--   <origin xyz="0 0 0" rpy="0 0 0" /> -->
+    <!--   <geometry> -->
+    <!--     <sphere radius="0.033" /> -->
+    <!--   </geometry> -->
+    <!--   <material name="Yellow"> -->
+    <!--     <color rgba="1.0 1.0 0 1.0"/> -->
+    <!--   </material> -->
+    <!-- </visual> -->
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.05"/>
+      <inertia
+          ixx="0.00001" ixy="0.0" ixz="0.0"
+          iyy="0.00001" iyz="0.0"
+          izz="0.00002"/>
+    </inertial>
+  </link>
+
+</robot>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="estimate_mode"  default= "1" />
+  <arg name="headless" default="True" />
+
+  <!-- <include file="$(find dragon_valve)/launch/include/dragon_bringup.launch" > -->
+  <!--   <arg name="real_machine" value="$(arg real_machine)" /> -->
+  <!--   <arg name="simulation" value="$(arg simulation)" /> -->
+  <!--   <arg name="estimate_mode"  value= "$(arg estimate_mode)" /> -->
+  <!--   <arg name="headless" value="$(arg headless)" /> -->
+  <!-- </include> -->
+
+
+  <node pkg="dragon_valve" type="task.py" name="valve_task_motion" output="screen" ns="dragon">
+    <rosparam file="$(find dragon_valve)/config/task.yaml" command="load" />
+  </node>
+
+  <node pkg="rostopic" type="rostopic" name="valve_pose" args="pub -r 10 /valve/mocap/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: base_link}, pose: {position: {x: 2.0, y: 1.0, z: 0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, x: 0.0}}}'" output="screen" if="$(eval arg('simulation') and not arg('real_machine'))"/>
+
+</launch>
