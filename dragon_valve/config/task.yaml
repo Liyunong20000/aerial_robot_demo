@@ -13,13 +13,13 @@ joint:
   conv_thresh: 0.017 # rad
 
 approach:
-  tip_offset: 0.15
+  tip_offset: [0.025, 0, 0.15]
   pos_conv_thresh: 0.08 # m
   yaw_conv_thresh: 0.1  # rad
   att_conv_thresh: 0.06 # rad
 
 adjust:
-  tip_offset: 0.02
+  tip_offset: [0.025, 0, 0.02]
   pos_conv_thresh: 0.08 # m
   yaw_conv_thresh: 0.1  # rad
   att_conv_thresh: 0.1 # rad
@@ -30,3 +30,6 @@ manipulate:
   rate: 20.0 # Hz
   action: open # workaround to designate the open/close action
   fixed_traj: true # whether fixed the radius of the manipulating circle trajectory
+
+finish:
+  tip_z_offset: 0.2

@@ -57,7 +57,7 @@ class DragonInterface:
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
 
         # TODO: move following implementations to inherited taks-oriented class
-        self.valve_pose_ = PoseStamped()
+        self.valve_pose_ = None
         self.valve_pose_topic_name = rospy.get_param('~valve_pose_topic')
         self.valve_pose_sub = rospy.Subscriber(self.valve_pose_topic_name, PoseStamped, self.valvePoseCallback)
 
@@ -289,6 +289,9 @@ class DragonInterface:
 
     def getTaskHaltFlag(self):
         return self.halt_task_
+
+    def resetTaskHaltFlag(self):
+        self.halt_task_ = False
 
     def getForceSkipFlag(self):
         return self.force_skip_

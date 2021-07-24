@@ -80,6 +80,11 @@ class Start(BaseState):
         userdata.init_cog_pos = self.robot.getCogPos()
         userdata.init_cog_yaw = self.robot.getCogRPY()[2]
 
+        # check the valve msg
+        if self.robot.getValvePose() is None:
+            rospy.logwarn(self.__class__.__name__ + ': no valve pose message received')
+            return 'preempted'
+
         return 'succeeded'
 
 class Joint(BaseState):
@@ -108,7 +113,7 @@ class Joint(BaseState):
                 break
 
             if self.robot.getTaskHaltFlag():
-                rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": taks is halted")
+                rospy.logwarn(self.__class__.__name__  + ": taks is halted")
                 return 'failed'
 
             rospy.sleep(0.1)
@@ -138,23 +143,23 @@ class Approach(BaseState):
         self.baselink_name = robot_name + '/' + rospy.get_param('~baselink_name', 'baselink')
         self.cog_name = robot_name + '/' + rospy.get_param('~cog_name', 'cog')
 
-        self.tip_offset = rospy.get_param('~' + motion + '/tip_offset', 0.1)
+        self.tip_offset = rospy.get_param('~' + motion + '/tip_offset', [0, 0, 0])
         self.pos_conv_thresh = rospy.get_param('~' + motion + '/pos_conv_thresh', 0.06)
         self.yaw_conv_thresh = rospy.get_param('~' + motion + '/yaw_conv_thresh', 0.1)
         self.att_conv_thresh = rospy.get_param('~' + motion + '/att_conv_thresh', 0.06)
 
     # TODO: end effector SE(3) pose, and joint angle according to valve orientation
-    def calculateTargetCogPose(self, tip_offset = 0):
+    def calculateTargetCogPose(self, tip_offset = [0, 0, 0]):
 
         valve_pose = self.robot.getValvePose()
         target_end_effector_trans = tft.concatenate_matrices(ros_np.numpify(valve_pose),  # base
-                                                             tft.translation_matrix(np.array([0, 0, tip_offset])),  # origin offset
+                                                             tft.translation_matrix(tip_offset),  # origin offset
                                                              tft.euler_matrix(0, 0, self.valve_head_offset),  # yaw offset
                                                              tft.euler_matrix(0, np.pi/2, 0))  # gripper orientation regarding valve
 
 
         cog_trans = self.robot.getTF(self.cog_name, parent_frame_id= self.end_effector_name)
-        print("cog_trans: ", cog_trans)
+
         target_cog_trans = tft.concatenate_matrices(target_end_effector_trans, \
                                                     ros_np.numpify(cog_trans.transform))
 
@@ -262,7 +267,7 @@ class Manipulate(Approach):
                 r = np.linalg.norm(local_cog)
                 target_theta = np.arctan2(local_cog[1], local_cog[0]) + delta_yaw
 
-            rospy.loginfo("radius of manipulation trajectory: {}".format(np.linalg.norm(local_cog)))
+            rospy.loginfo_throttle(1.0, "radius of manipulation trajectory: {}".format(np.linalg.norm(local_cog)))
             target_pos[:2] = valve_pos[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
             target_vel = r * target_vel_yaw * np.array([-np.sin(target_theta), np.cos(target_theta), 0]) # TODO: SE(3)
 
@@ -284,18 +289,27 @@ class Finish(BaseState):
                            input_keys=['init_cog_pos', 'init_cog_yaw',
                                         'approach_cog_pos', 'approach_cog_yaw'])
         self.status = status
-        self.tip_offset = rospy.get_param('~approach/tip_offset', 0.15)
+        self.tip_z_offset = rospy.get_param('~finish/tip_z_offset', 0.15)
 
     def execute(self, userdata):
+
+        self.robot.resetTaskHaltFlag() # reset task halt, since we are finishing the task
 
         if self.status == 'success':
             rospy.loginfo(self.__class__.__name__ + '_' + self.status + ': leave girpper from valve')
             # TODO: extend to SE(3)
             target_pos = self.robot.getCogPos()
-            target_pos[2] += self.tip_offset
+            target_pos[2] += self.tip_z_offset
             self.robot.goPosWaitConvergence(target_pos, self.robot.getCogRPY()[2], \
                                             pos_conv_thresh = 0.1, yaw_conv_thresh = 0.2)
+            rospy.sleep(2.0) # for final convergence to the end pose
 
+
+        # joint angle
+        joint_state = JointState()
+        joint_state.name = ['joint1_pitch']
+        joint_state.position = [0]
+        self.robot.setJointAngle(joint_state)
 
         rospy.loginfo_throttle(0.5, self.__class__.__name__ + '_' + self.status + ': back to home')
         self.robot.goPosWaitConvergence(userdata.init_cog_pos, self.robot.getCogRPY()[2], \
