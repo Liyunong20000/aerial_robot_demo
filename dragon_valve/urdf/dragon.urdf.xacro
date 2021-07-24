@@ -4,25 +4,24 @@
 
   <xacro:include filename="$(find dragon)/robots/quad/euclid_201709.urdf.xacro" />
 
+  <xacro:property name="offset" value="0.013" />
+
   <joint name="gripper_joint" type="fixed">
     <parent link="link1"/>
     <child link="gripper"/>
-    <origin rpy="0 0 ${pi}" xyz="0.01 0.0 0"/>
+    <origin xyz="${offset} 0 0" rpy="0 0 ${pi}"/>
     <axis xyz="0 0 1"/>
   </joint>
   <link name="gripper">
-    <!-- <visual> -->
-    <!--   <origin xyz="0 0 0" rpy="0 0 0" /> -->
-    <!--   <geometry> -->
-    <!--     <sphere radius="0.033" /> -->
-    <!--   </geometry> -->
-    <!--   <material name="Yellow"> -->
-    <!--     <color rgba="1.0 1.0 0 1.0"/> -->
-    <!--   </material> -->
-    <!-- </visual> -->
+    <visual>
+      <origin xyz="-${offset} 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dragon_valve/urdf/mesh/valve_gripper.dae"/>
+      </geometry>
+    </visual>
     <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.05"/>
+      <origin xyz="-${offset} 0 0" rpy="0 0 0"/>
+      <mass value="${0.0856 - 0.0452}"/> <!-- additional weight compared to stantdard gripper  -->
       <inertia
           ixx="0.00001" ixy="0.0" ixz="0.0"
           iyy="0.00001" iyz="0.0"
