@@ -284,6 +284,10 @@ class DragonInterface:
     def valvePoseCallback(self, msg):
         self.valve_pose_ = msg.pose
 
+        # TODO: we need once?
+        rospy.loginfo("get pose of valve")
+        self.valve_pose_sub.unregister()
+
     def getValvePose(self):
         return self.valve_pose_
 
