@@ -239,6 +239,12 @@ class Manipulate(Approach):
 
             if sum_turn_angle > self.round_num * np.pi * 2:
                 rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": complete valve manipulation")
+                # TODO: relax the final waiting position
+                #target_theta -= delta_yaw
+                #target_pos[:2] = ros_np.numpify(self.robot.getValvePose().position)[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
+                #target_yaw = curr_yaw - delta_yaw
+                #self.robot.goPosVel(target_pos, np.array([0,0,0]), target_yaw, 0)
+                self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), curr_yaw, 0)
                 break
 
             if self.robot.getTaskHaltFlag():
