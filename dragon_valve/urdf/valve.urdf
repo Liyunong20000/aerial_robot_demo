@@ -136,4 +136,15 @@
     </plugin>
   </gazebo>
 
+  <gazebo reference="valve_joint">
+    <provideFeedback>true</provideFeedback>
+  </gazebo>
+  <gazebo>
+    <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+      <updateRate>100.0</updateRate>
+      <topicName>valve/wrench</topicName>
+      <jointName>valve_joint</jointName>
+    </plugin>
+  </gazebo>
+
 </robot>
