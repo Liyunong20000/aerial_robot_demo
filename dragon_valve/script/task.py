@@ -6,11 +6,10 @@ import smach_ros
 from dragon_valve.dragon_interface import DragonInterface
 from sensor_msgs.msg import JointState
 import numpy as np
-from geometry_msgs.msg import Transform, Inertia, PoseArray, PoseStamped
+from geometry_msgs.msg import Transform, Inertia, PoseArray, PoseStamped, Wrench
 import tf.transformations as tft
 import ros_numpy as ros_np
 from std_msgs.msg import UInt8, Empty
-from gazebo_msgs.srv import ApplyBodyWrench, ApplyBodyWrenchRequest
 import copy
 import std_srvs.srv
 from tf.transformations import *
@@ -203,7 +202,6 @@ class Manipulate(Approach):
         self.rate = rospy.get_param('~manipulate/rate', 20.0) # hz
         self.action = rospy.get_param('~manipulate/action', 'open')
         self.fixed_traj = rospy.get_param('~manipulate/fixed_traj', False)
-        # TODO: additional torque
 
     def execute(self, userdata):
 
@@ -226,9 +224,12 @@ class Manipulate(Approach):
         fixed_r = -1
         target_theta = 0
 
+        valve_force = [0,0,0] # [x,y,z] w.r.t world frame
+        valve_torque = [0,0,1.0] # workaround valve torque
+        self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
+
         while True:
             curr_yaw = self.robot.getCogRPY()[2] # TODO: do we need Baselink?
-
 
             delta = curr_yaw - prev_yaw
             if delta > np.pi:
@@ -239,12 +240,6 @@ class Manipulate(Approach):
 
             if sum_turn_angle > self.round_num * np.pi * 2:
                 rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": complete valve manipulation")
-                # TODO: relax the final waiting position
-                #target_theta -= delta_yaw
-                #target_pos[:2] = ros_np.numpify(self.robot.getValvePose().position)[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
-                #target_yaw = curr_yaw - delta_yaw
-                #self.robot.goPosVel(target_pos, np.array([0,0,0]), target_yaw, 0)
-                self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), curr_yaw, 0)
                 break
 
             if self.robot.getTaskHaltFlag():
@@ -277,13 +272,30 @@ class Manipulate(Approach):
             target_pos[:2] = valve_pos[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
             target_vel = r * target_vel_yaw * np.array([-np.sin(target_theta), np.cos(target_theta), 0]) # TODO: SE(3)
 
-
             self.robot.goPosVel(target_pos, target_vel, target_yaw, target_vel_yaw)
+
+            # consider the centripetal force
+            actual_vel = np.linalg.norm(np.array([self.robot.getCogLinearVel()[0], self.robot.getCogLinearVel()[1], 0])) # TODO: SE(3)
+            # circular_vel = r * self.robot.getCogAngularVel()[2]
+            # if np.abs(circular_vel - actual_vel) < circular_vel * 0.2 and \
+            #    self.robot.getCogAngularVel()[2] > target_vel_yaw * 0.5 and \
+            #    actual_vel > r * target_vel_yaw * 0.5: # workaround to checkt the movement is circular
+            #     valve_force = self.robot.getMass() * circular_vel  * self.robot.getCogAngularVel()[2] * np.array([-np.cos(target_theta), -np.sin(target_theta), 0]) # TODO: SE(3)
+            #     #rospy.loginfo("is circular movement, compensate the centripetal force")
+            # else:
+            #     valve_force = [0,0,0]
+            #     rospy.loginfo("is not circular movement, {}, {}, diff is {}".format(circular_vel, actual_vel, circular_vel - actual_vel))
+            valve_force = self.robot.getMass() * actual_vel * actual_vel / r * np.array([-np.cos(target_theta), -np.sin(target_theta), 0]) # TODO: SE(3) + LPF
+
+            self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
             prev_yaw = curr_yaw
             rospy.sleep(delta_t)
 
+        # relax the final waiting position
+        self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), self.robot.getCogRPY()[2], 0)
 
+        self.robot.clearExternalWrench('valve')
 
         rospy.sleep(2.0) # for final convergence to the end pose
         return "succeeded"

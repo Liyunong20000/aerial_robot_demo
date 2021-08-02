@@ -11,8 +11,9 @@ from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from std_srvs.srv import SetBool, SetBoolRequest
 import tf2_ros
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Wrench, Vector3
 from sensor_msgs.msg import Joy
+from gazebo_msgs.srv import ApplyBodyWrenchRequest, BodyRequest
 
 class DragonInterface:
     def __init__(self, debug_view = False):
@@ -36,6 +37,7 @@ class DragonInterface:
         self.target_yaw_ = 0
 
         self.robot_name = rospy.get_param('~robot_name', 'dragon')
+        self.mass = rospy.get_param('~robot_mass', 7.3) # TODO: get from robot model
         self.joint_state_sub_ = rospy.Subscriber('joint_states', JointState, self.jointStateCallback)
         self.joint_ctrl_pub_ = rospy.Publisher('joints_ctrl', JointState, queue_size = 1)
         self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
@@ -48,6 +50,8 @@ class DragonInterface:
         self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
         self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
+
+        self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -132,6 +136,9 @@ class DragonInterface:
     def getBaselinkLinearVel(self):
         return ros_np.numpify(self.baselink_odom_.twist.twist.linear)
 
+    def getBaselinkAngularVel(self):
+        return ros_np.numpify(self.baselink_odom_.twist.twist.angular)
+
     def getCogPos(self):
         return ros_np.numpify(self.cog_odom_.pose.pose.position)
 
@@ -143,6 +150,9 @@ class DragonInterface:
 
     def getCogLinearVel(self):
         return ros_np.numpify(self.cog_odom_.twist.twist.linear)
+
+    def getCogAngularVel(self):
+        return ros_np.numpify(self.cog_odom_.twist.twist.angular)
 
     def getFlightState(self):
         return self.flight_state_
@@ -314,3 +324,21 @@ class DragonInterface:
             self.force_skip_ = True
 
         self.prev_joy_state = msg
+
+
+    def addExternalWrench(self, wrench_name, reference_frame, force, torque):
+
+        wrench = Wrench(force = Vector3(*force), torque = Vector3(*torque))
+        msg = ApplyBodyWrenchRequest(body_name = wrench_name, reference_frame = reference_frame, wrench = wrench)
+        self.add_wrench_pub.publish(msg)
+
+    def clearExternalWrench(self, wrench_name):
+
+        try:
+            clear_external_wrench = rospy.ServiceProxy('clear_external_wrench', BodyRequest)
+            resp = clear_external_wrench(body_name = wrench_name)
+        except rospy.ServiceException as e:
+            rospy.logerror("Service call failed: {}".format(e))
+
+    def getMass(self):
+        return self.mass
