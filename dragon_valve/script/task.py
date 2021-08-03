@@ -293,7 +293,7 @@ class Manipulate(Approach):
         self.angular_velocity = rospy.get_param('~manipulate/angular_velocity', 1.0) # rad/s
         self.round_num = rospy.get_param('~manipulate/round_num', 1)
         self.torque_adjust_k = rospy.get_param('~manipulate/torque_adjust_k', 1.0)
-        self.torque_adjust_thresh = rospy.get_param('~manipulate/torque_adjust_thresh', 0.1)
+        self.torque_adjust_thresh = rospy.get_param('~manipulate/torque_adjust_thresh', 0.04) # rad
         self.torque_limit = rospy.get_param('~manipulate/torque_limit', 3.0) # Nm
         self.rate = rospy.get_param('~manipulate/rate', 20.0) # hz
         self.action = rospy.get_param('~manipulate/action', 'open')
@@ -375,12 +375,13 @@ class Manipulate(Approach):
             actual_vel = np.linalg.norm(np.array([self.robot.getCogLinearVel()[0], self.robot.getCogLinearVel()[1], 0])) # TODO: SE(3)
             valve_force = self.robot.getMass() * actual_vel * actual_vel / r * np.array([-np.cos(target_theta), -np.sin(target_theta), 0]) # TODO: SE(3) + LPF
 
-            # adjust torquce according to roll axis torque
+            # adjust torquce according to roll angle 
             # TODO: SE(3)
-            roll_moment = self.robot.getEstimatedWrench().torque.x - est_wrench_offset.torque.x
-            if np.abs(roll_moment) < self.torque_adjust_thresh:
-                roll_moment = 0
-            adjust_valve_torque = turn_direction * (-roll_moment) * self.torque_adjust_k * delta_t # TODO: direction of valve
+            # Note: the external wrench estimation is not correct when contact with valve, sine the rotational motion is not based on a free rigid body (roll and pitch are independent)
+            delta_angle = self.robot.getCogRPY()[0] # TODO: change to SE(3)
+            if np.abs(delta_angle) < self.torque_adjust_thresh:
+                delta_angle = 0
+            adjust_valve_torque = turn_direction * (-delta_angle) * self.torque_adjust_k * delta_t # TODO: direction of valve
             valve_torque[2] += adjust_valve_torque # TODO: SE(3)
 
             # check the limit of torque
