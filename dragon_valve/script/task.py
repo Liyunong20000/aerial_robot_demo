@@ -128,7 +128,7 @@ class Approach(BaseState):
                  outcomes=['succeeded', 'failed'],
                  input_keys=[],
                  output_keys=[],
-                 io_keys=['target_cog_pos', 'target_cog_yaw']):
+                 io_keys=['target_cog_pos', 'target_cog_yaw', 'est_wrench_offset']):
         BaseState.__init__(self, robot, outcomes=outcomes, input_keys=input_keys, output_keys=output_keys, io_keys=io_keys)
 
         self.motion = motion
@@ -174,6 +174,9 @@ class Approach(BaseState):
         # TODO: change to SE(3)
         conv_flag = self.robot.goPosWaitConvergence(target_cog_pos, target_cog_yaw, pos_conv_thresh = self.pos_conv_thresh, yaw_conv_thresh = self.yaw_conv_thresh, att_conv_thresh = self.att_conv_thresh, timeout = 30)
 
+        # restore the offset of estimated wrench for further manipulation phase
+        userdata.est_wrench_offset = self.robot.getEstimatedWrench()
+
         # TODO: do we need to return 'failed' if not reach convergence?
         if not conv_flag:
             while not self.robot.getForceSkipFlag():
@@ -191,21 +194,112 @@ class Approach(BaseState):
 
         return 'succeeded'
 
+class Contact(Approach):
+    def __init__(self, robot):
+        Approach.__init__(self, robot, motion = 'contact',
+                          input_keys=[],
+                          output_keys=[], io_keys=['target_cog_pos', 'target_cog_yaw', 'init_torque'])
+
+        self.rate = rospy.get_param('~contact/rate', 10.0) # hz
+        self.angular_velocity = rospy.get_param('~contact/angular_velocity', 0.2) # rad/s
+        self.init_torque = rospy.get_param('~contact/init_torque', 0.1) # Nm
+        self.incre_torque_rate = rospy.get_param('~contact/incre_torque_rate', 1) # Nm/s
+        self.move_thresh = rospy.get_param('~contact/move_thresh', 0.1) # valve or robot yaw angle move thresh
+        self.check_t = rospy.get_param('~contact/check_interval', 1.0) # s
+        self.action = rospy.get_param('~manipulate/action', 'open')
+
+
+    def execute(self, userdata):
+
+        rospy.sleep(3.0) # workaround to wait for the convergence of approach adjust.
+
+        init_valve_yaw = tft.euler_from_quaternion(ros_np.numpify(self.robot.getValvePose().orientation))[2] # TODO: SE(3)
+        prev_yaw = self.robot.getCogRPY()[2]
+        delta_t = 1 / self.rate
+        start_t = rospy.get_time()
+
+        valve_coord_z_axis = tft.quaternion_matrix(ros_np.numpify(self.robot.getValvePose().orientation))[:3, 2]
+        turn_direction = 0
+        if self.action == 'open':
+            turn_direction = valve_coord_z_axis[2] / np.fabs(valve_coord_z_axis[2])
+        elif self.action == 'close':
+            turn_direction = -valve_coord_z_axis[2] / np.fabs(valve_coord_z_axis[2])
+        else:
+            rospy.logerror(self.__class__.__name__  + "_" + self.motion + ": no support action of {}, please choose in ['open', 'close']".format(self.action))
+            return 'failed'
+
+        contact = False
+        prev_contact_t = rospy.get_time()
+
+        while True:
+
+            curr_yaw = self.robot.getCogRPY()[2]
+
+            # provide yaw motion to contact
+            if contact:
+                target_yaw = curr_yaw
+                self.robot.goYawVel(np.array([0,0,0]), target_yaw)
+            else:
+                target_vel_yaw = turn_direction * self.angular_velocity
+                target_yaw = curr_yaw + delta_t * target_vel_yaw
+                self.robot.goYawVel(np.array([0,0,0]), target_yaw)
+                # TODO: check whether need target vel yaw
+
+
+            # add external wrench which gradually increases
+            valve_force = [0,0,0] # [x,y,z] w.r.t world frame
+            valve_torque = [0,0, self.init_torque * turn_direction] # workaround valve torque
+            self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
+
+            # check the contact with valve
+            if rospy.get_time() - prev_contact_t > self.check_t and not contact:
+
+                # check the angle change within the duration of self.check_t
+                if np.abs(curr_yaw - prev_yaw) < self.angular_velocity * 0.5:
+                    contact = True
+                    rospy.loginfo(self.__class__.__name__  + "_" + self.motion + ": contact with valve handle, torque: {}".format(self.init_torque))
+
+                prev_yaw = curr_yaw
+                prev_contact_t = rospy.get_time()
+
+
+            # check the move of valve
+            valve_yaw = tft.euler_from_quaternion(ros_np.numpify(self.robot.getValvePose().orientation))[2]
+            if turn_direction * (valve_yaw - init_valve_yaw) > self.move_thresh:
+                rospy.loginfo(self.__class__.__name__  + "_" + self.motion + ": valve move with torque of {}".format(self.init_torque))
+                userdata.init_torque = valve_torque
+                userdata.target_cog_pos = self.robot.getCogPos()
+                userdata.target_cog_yaw = target_yaw
+                return 'succeeded'
+
+            if self.robot.getTaskHaltFlag():
+                rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": taks is halted")
+                self.robot.clearExternalWrench('valve')
+                self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), curr_yaw, 0)
+                return 'failed'
+
+            self.init_torque += self.incre_torque_rate * delta_t
+
+            rospy.sleep(delta_t)
+
+
+
 class Manipulate(Approach):
     def __init__(self, robot):
         Approach.__init__(self, robot, motion = 'manipulate',
-                          input_keys=['init_grasp_cog_pos', 'init_grasp_cog_yaw'],
+                          input_keys=['init_grasp_cog_pos', 'init_grasp_cog_yaw', 'init_torque', 'est_wrench_offset'],
                           output_keys=[], io_keys=[])
 
         self.angular_velocity = rospy.get_param('~manipulate/angular_velocity', 1.0) # rad/s
         self.round_num = rospy.get_param('~manipulate/round_num', 1)
+        self.torque_adjust_k = rospy.get_param('~manipulate/torque_adjust_k', 1.0)
+        self.torque_adjust_thresh = rospy.get_param('~manipulate/torque_adjust_thresh', 0.1)
+        self.torque_limit = rospy.get_param('~manipulate/torque_limit', 3.0) # Nm
         self.rate = rospy.get_param('~manipulate/rate', 20.0) # hz
         self.action = rospy.get_param('~manipulate/action', 'open')
         self.fixed_traj = rospy.get_param('~manipulate/fixed_traj', False)
 
     def execute(self, userdata):
-
-        rospy.sleep(4.0) # workaround to wait for the convergence of approach adjust.
 
         sum_turn_angle = 0
         prev_yaw = self.robot.getCogRPY()[2] # TODO: change to SE(3)
@@ -224,8 +318,11 @@ class Manipulate(Approach):
         fixed_r = -1
         target_theta = 0
 
+        valve_pos = ros_np.numpify(self.robot.getValvePose().position)
+
+        est_wrench_offset = userdata.est_wrench_offset
         valve_force = [0,0,0] # [x,y,z] w.r.t world frame
-        valve_torque = [0,0,1.0] # workaround valve torque
+        valve_torque = userdata.init_torque
         self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
         while True:
@@ -250,7 +347,7 @@ class Manipulate(Approach):
             delta_yaw = delta_t * target_vel_yaw
             target_yaw = curr_yaw + delta_yaw # base on current yaw angle
 
-            valve_pos = ros_np.numpify(self.robot.getValvePose().position)
+
             target_pos = userdata.init_grasp_cog_pos
             local_cog = self.robot.getCogPos()[:2] - valve_pos[:2]
 
@@ -276,16 +373,20 @@ class Manipulate(Approach):
 
             # consider the centripetal force
             actual_vel = np.linalg.norm(np.array([self.robot.getCogLinearVel()[0], self.robot.getCogLinearVel()[1], 0])) # TODO: SE(3)
-            # circular_vel = r * self.robot.getCogAngularVel()[2]
-            # if np.abs(circular_vel - actual_vel) < circular_vel * 0.2 and \
-            #    self.robot.getCogAngularVel()[2] > target_vel_yaw * 0.5 and \
-            #    actual_vel > r * target_vel_yaw * 0.5: # workaround to checkt the movement is circular
-            #     valve_force = self.robot.getMass() * circular_vel  * self.robot.getCogAngularVel()[2] * np.array([-np.cos(target_theta), -np.sin(target_theta), 0]) # TODO: SE(3)
-            #     #rospy.loginfo("is circular movement, compensate the centripetal force")
-            # else:
-            #     valve_force = [0,0,0]
-            #     rospy.loginfo("is not circular movement, {}, {}, diff is {}".format(circular_vel, actual_vel, circular_vel - actual_vel))
             valve_force = self.robot.getMass() * actual_vel * actual_vel / r * np.array([-np.cos(target_theta), -np.sin(target_theta), 0]) # TODO: SE(3) + LPF
+
+            # adjust torquce according to roll axis torque
+            # TODO: SE(3)
+            roll_moment = self.robot.getEstimatedWrench().torque.x - est_wrench_offset.torque.x
+            if np.abs(roll_moment) < self.torque_adjust_thresh:
+                roll_moment = 0
+            adjust_valve_torque = turn_direction * (-roll_moment) * self.torque_adjust_k * delta_t # TODO: direction of valve
+            valve_torque[2] += adjust_valve_torque # TODO: SE(3)
+
+            # check the limit of torque
+            if np.abs(valve_torque[2]) > self.torque_limit:
+                rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the limit of torque {}, finish manipulation".format(valve_torque[2]))
+                break
 
             self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
@@ -346,6 +447,8 @@ def main():
     sm_top.userdata.approach_cog_yaw = None
     sm_top.userdata.grasp_cog_pos = None
     sm_top.userdata.grasp_cog_yaw = None
+    sm_top.userdata.init_torque = None
+    sm_top.userdata.est_wrench_offset = None
 
 
     debug_view = rospy.get_param('~debug_view', True)
@@ -361,9 +464,11 @@ def main():
 
         sm_approach = smach.StateMachine(outcomes=['succeeded', 'failed'],
                                          input_keys=['approach_cog_pos', 'approach_cog_yaw',
-                                                      'grasp_cog_pos', 'grasp_cog_yaw'],
+                                                      'grasp_cog_pos', 'grasp_cog_yaw',
+                                                     'est_wrench_offset'],
                                          output_keys=['approach_cog_pos', 'approach_cog_yaw',
-                                                      'grasp_cog_pos', 'grasp_cog_yaw'])
+                                                      'grasp_cog_pos', 'grasp_cog_yaw',
+                                                      'est_wrench_offset'])
 
         with sm_approach:
 
@@ -375,27 +480,39 @@ def main():
                                    transitions={'succeeded':'Adjust',
                                                 'failed':'failed'},
                                    remapping={'target_cog_pos':'approach_cog_pos',
-                                              'target_cog_yaw':'approach_cog_yaw'})
+                                              'target_cog_yaw':'approach_cog_yaw',
+                                              'est_wrench_offset':'est_wrench_offset'})
 
             smach.StateMachine.add('Adjust', Approach(robot, motion = 'adjust'),
                                    transitions={'succeeded':'succeeded',
                                                 'failed':'failed'},
                                    remapping={'target_cog_pos':'grasp_cog_pos',
-                                              'target_cog_yaw':'grasp_cog_yaw'})
+                                              'target_cog_yaw':'grasp_cog_yaw',
+                                              'est_wrench_offset':'est_wrench_offset'})
 
         smach.StateMachine.add('Approach', sm_approach,
-                               transitions={'succeeded':'Manipulate',
+                               transitions={'succeeded':'Contact',
                                             'failed':'Fail'},
                                remapping={'approach_cog_pos':'approach_cog_pos',
                                           'approach_cog_yaw':'approach_cog_yaw',
                                           'grasp_cog_pos':'grasp_cog_pos',
-                                          'grasp_cog_yaw':'grasp_cog_yaw'})
+                                          'grasp_cog_yaw':'grasp_cog_yaw',
+                                          'est_wrench_offset':'est_wrench_offset'})
+
+        smach.StateMachine.add('Contact', Contact(robot),
+                               transitions={'succeeded':'Manipulate',
+                                            'failed':'Fail'},
+                               remapping={'target_cog_pos':'grasp_cog_pos',
+                                          'target_cog_yaw':'grasp_cog_yaw',
+                                          'init_torque':'init_torque'})
 
         smach.StateMachine.add('Manipulate', Manipulate(robot),
                                transitions={'succeeded':'Success',
                                             'failed':'Fail'},
                                remapping={'init_grasp_cog_pos':'grasp_cog_pos',
-                                          'init_grasp_cog_yaw':'grasp_cog_yaw'})
+                                          'init_grasp_cog_yaw':'grasp_cog_yaw',
+                                          'init_torque':'init_torque',
+                                          'est_wrench_offset':'est_wrench_offset'})
 
         smach.StateMachine.add('Success', Finish(robot, 'success'),
                                transitions={'preempted':'preempted'},

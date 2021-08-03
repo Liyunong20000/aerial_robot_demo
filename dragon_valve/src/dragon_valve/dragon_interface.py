@@ -11,7 +11,7 @@ from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from std_srvs.srv import SetBool, SetBoolRequest
 import tf2_ros
-from geometry_msgs.msg import PoseStamped, Wrench, Vector3
+from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped
 from sensor_msgs.msg import Joy
 from gazebo_msgs.srv import ApplyBodyWrenchRequest, BodyRequest
 
@@ -49,6 +49,7 @@ class DragonInterface:
         self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
         self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
+        self.est_wrench_sub_ = rospy.Subscriber('estimated_external_wrench', WrenchStamped, self.estimatedExternalWrenchCallback)
         self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
 
         self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest)
@@ -172,6 +173,27 @@ class DragonInterface:
         nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
         self.navigation(nav_msg)
 
+    # TODO: special 
+    def goYawVel(self, target_vel, target_yaw):
+
+        nav_msg = FlightNav()
+        nav_msg.control_frame = nav_msg.WORLD_FRAME
+
+        nav_msg.header.stamp = rospy.Time.now()
+        nav_msg.target = FlightNav.COG
+        nav_msg.pos_xy_nav_mode = FlightNav.VEL_MODE
+        nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
+        nav_msg.target_vel_x = target_vel[0]
+        nav_msg.target_vel_y = target_vel[1]
+
+        nav_msg.yaw_nav_mode = FlightNav.POS_MODE
+        target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
+        nav_msg.target_yaw = target_yaw
+
+        self.target_yaw_ = target_yaw
+
+        self.nav_pub_.publish(nav_msg)
+
     # TODO: extend to SE(3)
     def goPosVel(self, target_pos, target_vel, target_yaw, target_vel_yaw):
 
@@ -294,9 +316,7 @@ class DragonInterface:
     def valvePoseCallback(self, msg):
         self.valve_pose_ = msg.pose
 
-        # TODO: we need once?
-        rospy.loginfo("get pose of valve")
-        self.valve_pose_sub.unregister()
+        rospy.loginfo_once("get pose of valve")
 
     def getValvePose(self):
         return self.valve_pose_
@@ -339,6 +359,12 @@ class DragonInterface:
             resp = clear_external_wrench(body_name = wrench_name)
         except rospy.ServiceException as e:
             rospy.logerror("Service call failed: {}".format(e))
+
+    def estimatedExternalWrenchCallback(self, msg):
+        self.est_wrench = msg.wrench
+
+    def getEstimatedWrench(self):
+        return self.est_wrench
 
     def getMass(self):
         return self.mass

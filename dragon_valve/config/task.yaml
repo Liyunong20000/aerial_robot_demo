@@ -24,6 +24,14 @@ adjust:
   yaw_conv_thresh: 0.1  # rad
   att_conv_thresh: 0.1 # rad
 
+contact:
+  rate: 10.0
+  angular_velocity: 0.2
+  init_torque: 0.1 # Nm
+  incre_torque_rate: 0.1 # Nm/s
+  move_thresh: 0.1 # rad. angle change of valve
+  check_interval: 1.0 # s. check the contact between robot and valve interval
+
 manipulate:
   angular_velocity: 0.8 #0.5 # rad/s
   round_num: 2
