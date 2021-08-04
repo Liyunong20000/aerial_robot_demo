@@ -28,9 +28,9 @@ contact:
   rate: 10.0
   angular_velocity: 0.2
   init_torque: 0.1 # Nm
-  incre_torque_rate: 0.1 # Nm/s
+  incre_torque_rate: 0.2 # 0.1 is OK # Nm/s
   move_thresh: 0.1 # rad. angle change of valve
-  check_interval: 1.0 # s. check the contact between robot and valve interval
+  check_interval: 4.0 # s. check the contact between robot and valve interval
 
 manipulate:
   angular_velocity: 0.8 #0.5 # rad/s
@@ -38,6 +38,10 @@ manipulate:
   rate: 20.0 # Hz
   action: open # workaround to designate the open/close action
   fixed_traj: false # whether fixed the radius of the manipulating circle trajectory
+  torque_adjust_thresh: 0.2
+  torque_adjust_k: 1.0
+  torque_limit: 5.0
+  yaw_velocity_thresh: 0.1 # diff between true and target yaw velocity
 
 finish:
   tip_z_offset: 0.2

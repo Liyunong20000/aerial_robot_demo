@@ -1,7 +1,7 @@
 import rospy
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
-from aerial_robot_msgs.msg import FlightNav
+from aerial_robot_msgs.msg import FlightNav, PoseControlPid
 import numpy as np
 import ros_numpy as ros_np
 from tf.transformations import *
@@ -50,9 +50,10 @@ class DragonInterface:
         self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
         self.est_wrench_sub_ = rospy.Subscriber('estimated_external_wrench', WrenchStamped, self.estimatedExternalWrenchCallback)
+        self.control_pid_sub_ = rospy.Subscriber('debug/pose/pid', PoseControlPid, self.controlPidCallback)
         self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
 
-        self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest)
+        self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest, queue_size = 1)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -174,7 +175,7 @@ class DragonInterface:
         self.navigation(nav_msg)
 
     # TODO: special 
-    def goYawVel(self, target_vel, target_yaw):
+    def goYawVel(self, target_vel, target_yaw, target_vel_yaw = 0):
 
         nav_msg = FlightNav()
         nav_msg.control_frame = nav_msg.WORLD_FRAME
@@ -186,9 +187,10 @@ class DragonInterface:
         nav_msg.target_vel_x = target_vel[0]
         nav_msg.target_vel_y = target_vel[1]
 
-        nav_msg.yaw_nav_mode = FlightNav.POS_MODE
+        nav_msg.yaw_nav_mode = FlightNav.POS_VEL_MODE
         target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
         nav_msg.target_yaw = target_yaw
+        nav_msg.target_omega_z = target_vel_yaw
 
         self.target_yaw_ = target_yaw
 
@@ -363,8 +365,15 @@ class DragonInterface:
     def estimatedExternalWrenchCallback(self, msg):
         self.est_wrench = msg.wrench
 
+
     def getEstimatedWrench(self):
         return self.est_wrench
 
     def getMass(self):
         return self.mass
+
+    def controlPidCallback(self, msg):
+        self.control_pid = msg
+
+    def getControlPid(self):
+        return self.control_pid

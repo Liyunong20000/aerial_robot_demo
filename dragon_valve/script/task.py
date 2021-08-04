@@ -205,7 +205,7 @@ class Contact(Approach):
         self.init_torque = rospy.get_param('~contact/init_torque', 0.1) # Nm
         self.incre_torque_rate = rospy.get_param('~contact/incre_torque_rate', 1) # Nm/s
         self.move_thresh = rospy.get_param('~contact/move_thresh', 0.1) # valve or robot yaw angle move thresh
-        self.check_t = rospy.get_param('~contact/check_interval', 1.0) # s
+        self.check_interval = rospy.get_param('~contact/check_interval', 1.0) # s
         self.action = rospy.get_param('~manipulate/action', 'open')
 
 
@@ -218,6 +218,7 @@ class Contact(Approach):
         delta_t = 1 / self.rate
         start_t = rospy.get_time()
 
+        valve_pos = ros_np.numpify(self.robot.getValvePose().position)
         valve_coord_z_axis = tft.quaternion_matrix(ros_np.numpify(self.robot.getValvePose().orientation))[:3, 2]
         turn_direction = 0
         if self.action == 'open':
@@ -229,21 +230,37 @@ class Contact(Approach):
             return 'failed'
 
         contact = False
-        prev_contact_t = rospy.get_time()
+        prev_contact_t = rospy.get_time() + 2.0 # workaround
 
         while True:
 
             curr_yaw = self.robot.getCogRPY()[2]
 
             # provide yaw motion to contact
-            if contact:
-                target_yaw = curr_yaw
-                self.robot.goYawVel(np.array([0,0,0]), target_yaw)
-            else:
-                target_vel_yaw = turn_direction * self.angular_velocity
-                target_yaw = curr_yaw + delta_t * target_vel_yaw
-                self.robot.goYawVel(np.array([0,0,0]), target_yaw)
-                # TODO: check whether need target vel yaw
+            # if contact:
+            #     target_yaw = curr_yaw
+            #     self.robot.goYawVel(np.array([0,0,0]), target_yaw)
+            # else:
+            #     target_vel_yaw = turn_direction * self.angular_velocity
+            #     target_yaw = curr_yaw + delta_t * target_vel_yaw
+            #     self.robot.goYawVel(np.array([0,0,0]), target_yaw)
+
+            target_vel_yaw = turn_direction * self.angular_velocity
+            delta_yaw = delta_t * target_vel_yaw
+            target_yaw = curr_yaw + delta_yaw # base on current yaw angle
+
+            target_pos = userdata.target_cog_pos
+            local_cog = self.robot.getCogPos()[:2] - valve_pos[:2]
+
+            r = np.linalg.norm(local_cog)
+            target_theta = np.arctan2(local_cog[1], local_cog[0]) + delta_yaw
+
+            target_pos[:2] = valve_pos[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
+            target_vel = r * target_vel_yaw * np.array([-np.sin(target_theta), np.cos(target_theta), 0]) # TODO: SE(3)
+
+            self.robot.goPosVel(target_pos, target_vel, target_yaw, target_vel_yaw)
+            #self.robot.goYawVel(target_vel, curr_yaw, target_vel_yaw)
+            #self.robot.goYawVel(target_vel, curr_yaw)
 
 
             # add external wrench which gradually increases
@@ -252,10 +269,10 @@ class Contact(Approach):
             self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
             # check the contact with valve
-            if rospy.get_time() - prev_contact_t > self.check_t and not contact:
+            if rospy.get_time() - prev_contact_t > self.check_interval and not contact:
 
-                # check the angle change within the duration of self.check_t
-                if np.abs(curr_yaw - prev_yaw) < self.angular_velocity * 0.5:
+                # check the angle change within the duration of self.check_interval
+                if np.abs(curr_yaw - prev_yaw) < self.move_thresh:
                     contact = True
                     rospy.loginfo(self.__class__.__name__  + "_" + self.motion + ": contact with valve handle, torque: {}".format(self.init_torque))
 
@@ -268,7 +285,7 @@ class Contact(Approach):
             if turn_direction * (valve_yaw - init_valve_yaw) > self.move_thresh:
                 rospy.loginfo(self.__class__.__name__  + "_" + self.motion + ": valve move with torque of {}".format(self.init_torque))
                 userdata.init_torque = valve_torque
-                userdata.target_cog_pos = self.robot.getCogPos()
+                userdata.target_cog_pos = target_pos
                 userdata.target_cog_yaw = target_yaw
                 return 'succeeded'
 
@@ -278,6 +295,11 @@ class Contact(Approach):
                 self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), curr_yaw, 0)
                 return 'failed'
 
+            # TODO: give a more precise start time to incremently increase torque, and increase the self.incre_torque_rate
+            # current 0.2 Nm/s is too slow, waste of time
+            # The sart time can be calcualte from the valve type and the gripper offset
+            # e.g. type3: the turn angle is around 60 deg (1.08 rad), the speed is self.angular_velocity = 0.2 rad/s, thus time is about 5 sec. give a margin of 80%
+            # we can set start time as 4 second
             self.init_torque += self.incre_torque_rate * delta_t
 
             rospy.sleep(delta_t)
@@ -295,6 +317,7 @@ class Manipulate(Approach):
         self.torque_adjust_k = rospy.get_param('~manipulate/torque_adjust_k', 1.0)
         self.torque_adjust_thresh = rospy.get_param('~manipulate/torque_adjust_thresh', 0.04) # rad
         self.torque_limit = rospy.get_param('~manipulate/torque_limit', 3.0) # Nm
+        self.yaw_velocity_thresh = rospy.get_param('~manipulate/yaw_velocity_thresh', 0.1) # rad/s
         self.rate = rospy.get_param('~manipulate/rate', 20.0) # hz
         self.action = rospy.get_param('~manipulate/action', 'open')
         self.fixed_traj = rospy.get_param('~manipulate/fixed_traj', False)
@@ -375,13 +398,20 @@ class Manipulate(Approach):
             actual_vel = np.linalg.norm(np.array([self.robot.getCogLinearVel()[0], self.robot.getCogLinearVel()[1], 0])) # TODO: SE(3)
             valve_force = self.robot.getMass() * actual_vel * actual_vel / r * np.array([-np.cos(target_theta), -np.sin(target_theta), 0]) # TODO: SE(3) + LPF
 
-            # adjust torquce according to roll angle 
+            # adjust torquce according to roll moment
             # TODO: SE(3)
             # Note: the external wrench estimation is not correct when contact with valve, sine the rotational motion is not based on a free rigid body (roll and pitch are independent)
-            delta_angle = self.robot.getCogRPY()[0] # TODO: change to SE(3)
-            if np.abs(delta_angle) < self.torque_adjust_thresh:
-                delta_angle = 0
-            adjust_valve_torque = turn_direction * (-delta_angle) * self.torque_adjust_k * delta_t # TODO: direction of valve
+            control_pid = self.robot.getControlPid()
+            roll_moment = control_pid.roll.p_term[0] + control_pid.roll.i_term[0]
+            if np.abs(roll_moment) < self.torque_adjust_thresh:
+                roll_moment = 0
+            adjust_valve_torque = turn_direction * roll_moment * self.torque_adjust_k * delta_t # TODO: direction of valve
+            valve_torque[2] += adjust_valve_torque # TODO: SE(3)
+
+            delta_vel = target_vel_yaw - self.robot.getCogAngularVel()[2]
+            if np.abs(delta_vel) < self.yaw_velocity_thresh:
+                delta_vel = 0
+            adjust_valve_torque = turn_direction * delta_vel * self.torque_adjust_k * delta_t
             valve_torque[2] += adjust_valve_torque # TODO: SE(3)
 
             # check the limit of torque
