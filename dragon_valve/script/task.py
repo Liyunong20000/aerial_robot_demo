@@ -314,8 +314,9 @@ class Manipulate(Approach):
 
         self.angular_velocity = rospy.get_param('~manipulate/angular_velocity', 1.0) # rad/s
         self.round_num = rospy.get_param('~manipulate/round_num', 1)
-        self.torque_adjust_k = rospy.get_param('~manipulate/torque_adjust_k', 1.0)
-        self.torque_adjust_thresh = rospy.get_param('~manipulate/torque_adjust_thresh', 0.04) # rad
+        self.torque_adjust_roll_k = rospy.get_param('~manipulate/torque_adjust_roll_k', 1.0)
+        self.torque_adjust_yaw_k = rospy.get_param('~manipulate/torque_adjust_yaw_k', 1.0)
+        self.roll_moment_thresh = rospy.get_param('~manipulate/roll_moment_thresh', 0.04) # rad
         self.torque_limit = rospy.get_param('~manipulate/torque_limit', 3.0) # Nm
         self.yaw_velocity_thresh = rospy.get_param('~manipulate/yaw_velocity_thresh', 0.1) # rad/s
         self.rate = rospy.get_param('~manipulate/rate', 20.0) # hz
@@ -403,15 +404,15 @@ class Manipulate(Approach):
             # Note: the external wrench estimation is not correct when contact with valve, sine the rotational motion is not based on a free rigid body (roll and pitch are independent)
             control_pid = self.robot.getControlPid()
             roll_moment = control_pid.roll.p_term[0] + control_pid.roll.i_term[0]
-            if np.abs(roll_moment) < self.torque_adjust_thresh:
+            if np.abs(roll_moment) < self.roll_moment_thresh:
                 roll_moment = 0
-            adjust_valve_torque = turn_direction * roll_moment * self.torque_adjust_k * delta_t # TODO: direction of valve
+            adjust_valve_torque = turn_direction * roll_moment * self.torque_adjust_roll_k * delta_t # TODO: direction of valve
             valve_torque[2] += adjust_valve_torque # TODO: SE(3)
 
             delta_vel = target_vel_yaw - self.robot.getCogAngularVel()[2]
             if np.abs(delta_vel) < self.yaw_velocity_thresh:
                 delta_vel = 0
-            adjust_valve_torque = turn_direction * delta_vel * self.torque_adjust_k * delta_t
+            adjust_valve_torque = turn_direction * delta_vel * self.torque_adjust_yaw_k * delta_t
             valve_torque[2] += adjust_valve_torque # TODO: SE(3)
 
             # check the limit of torque

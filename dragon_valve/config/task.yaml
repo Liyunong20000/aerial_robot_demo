@@ -38,9 +38,10 @@ manipulate:
   rate: 20.0 # Hz
   action: open # workaround to designate the open/close action
   fixed_traj: false # whether fixed the radius of the manipulating circle trajectory
-  torque_adjust_thresh: 0.2
-  torque_adjust_k: 1.0
-  torque_limit: 5.0
+  roll_moment_thresh: 0.2
+  torque_adjust_roll_k: 0.2
+  torque_adjust_yaw_k: 1.0
+  torque_limit: 3.0
   yaw_velocity_thresh: 0.1 # diff between true and target yaw velocity
 
 finish:
