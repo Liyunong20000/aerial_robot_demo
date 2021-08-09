@@ -172,7 +172,7 @@ class Approach(BaseState):
         target_cog_pos, target_cog_yaw = self.calculateTargetCogPose(self.tip_offset)
 
         # TODO: change to SE(3)
-        conv_flag = self.robot.goPosWaitConvergence(target_cog_pos, target_cog_yaw, pos_conv_thresh = self.pos_conv_thresh, yaw_conv_thresh = self.yaw_conv_thresh, att_conv_thresh = self.att_conv_thresh, timeout = 30)
+        conv_flag = self.robot.goPoseWaitConvergence(target_cog_pos, target_cog_yaw, pos_conv_thresh = self.pos_conv_thresh, yaw_conv_thresh = self.yaw_conv_thresh, timeout = 30)
 
         # restore the offset of estimated wrench for further manipulation phase
         userdata.est_wrench_offset = self.robot.getEstimatedWrench()
@@ -258,9 +258,8 @@ class Contact(Approach):
             target_pos[:2] = valve_pos[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
             target_vel = r * target_vel_yaw * np.array([-np.sin(target_theta), np.cos(target_theta), 0]) # TODO: SE(3)
 
-            self.robot.goPosVel(target_pos, target_vel, target_yaw, target_vel_yaw)
+            self.robot.targetMotion(target_pos, target_yaw = target_yaw, target_vel = target_vel, target_vel_yaw = target_vel_yaw)
             #self.robot.goYawVel(target_vel, curr_yaw, target_vel_yaw)
-            #self.robot.goYawVel(target_vel, curr_yaw)
 
 
             # add external wrench which gradually increases
@@ -292,7 +291,7 @@ class Contact(Approach):
             if self.robot.getTaskHaltFlag():
                 rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": taks is halted")
                 self.robot.clearExternalWrench('valve')
-                self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), curr_yaw, 0)
+                self.robot.targetMotion(self.robot.getCogPos(), target_yaw = curr_yaw)
                 return 'failed'
 
             # TODO: give a more precise start time to incremently increase torque, and increase the self.incre_torque_rate
@@ -393,7 +392,7 @@ class Manipulate(Approach):
             target_pos[:2] = valve_pos[:2] + r * np.array([np.cos(target_theta), np.sin(target_theta)])
             target_vel = r * target_vel_yaw * np.array([-np.sin(target_theta), np.cos(target_theta), 0]) # TODO: SE(3)
 
-            self.robot.goPosVel(target_pos, target_vel, target_yaw, target_vel_yaw)
+            self.robot.targetMotion(target_pos, target_yaw = target_yaw, target_vel = target_vel, target_vel_yaw = target_vel_yaw)
 
             # consider the centripetal force
             actual_vel = np.linalg.norm(np.array([self.robot.getCogLinearVel()[0], self.robot.getCogLinearVel()[1], 0])) # TODO: SE(3)
@@ -426,7 +425,7 @@ class Manipulate(Approach):
             rospy.sleep(delta_t)
 
         # relax the final waiting position
-        self.robot.goPosVel(self.robot.getCogPos(), np.array([0,0,0]), self.robot.getCogRPY()[2], 0)
+        self.robot.targetMotion(self.robot.getCogPos(), target_yaw = self.robot.getCogRPY()[2])
 
         self.robot.clearExternalWrench('valve')
 
@@ -451,7 +450,7 @@ class Finish(BaseState):
             # TODO: extend to SE(3)
             target_pos = self.robot.getCogPos()
             target_pos[2] += self.tip_z_offset
-            self.robot.goPosWaitConvergence(target_pos, self.robot.getCogRPY()[2], \
+            self.robot.goPoseWaitConvergence(target_pos, self.robot.getCogRPY()[2], \
                                             pos_conv_thresh = 0.1, yaw_conv_thresh = 0.2)
             rospy.sleep(2.0) # for final convergence to the end pose
 
@@ -463,7 +462,7 @@ class Finish(BaseState):
         self.robot.setJointAngle(joint_state)
 
         rospy.loginfo_throttle(0.5, self.__class__.__name__ + '_' + self.status + ': back to home')
-        self.robot.goPosWaitConvergence(userdata.init_cog_pos, self.robot.getCogRPY()[2], \
+        self.robot.goPoseWaitConvergence(userdata.init_cog_pos, self.robot.getCogRPY()[2], \
                                         pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2)
         rospy.loginfo(self.__class__.__name__ + '_' + self.status + ': landing')
         self.robot.land()

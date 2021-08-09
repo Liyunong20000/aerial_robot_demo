@@ -11,7 +11,7 @@ from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from std_srvs.srv import SetBool, SetBoolRequest
 import tf2_ros
-from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped
+from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped, Quaternion
 from sensor_msgs.msg import Joy
 from gazebo_msgs.srv import ApplyBodyWrenchRequest, BodyRequest
 
@@ -43,6 +43,7 @@ class DragonInterface:
         self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
         self.baselink_odom_sub_ = rospy.Subscriber('uav/baselink/odom', Odometry, self.baselinkOdomCallback)
         self.nav_pub_ = rospy.Publisher('uav/nav', FlightNav, queue_size = 1)
+        self.rotation_pub_ = rospy.Publisher('target_rotation_motion', Odometry, queue_size = 1)
         self.start_pub_ = rospy.Publisher('teleop_command/start', Empty, queue_size = 1)
         self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
@@ -165,91 +166,69 @@ class DragonInterface:
     def getTargetYaw(self):
         return self.target_yaw_
 
-    #navigation
-    def noNavigation(self):
-        nav_msg = FlightNav()
-        nav_msg.header.stamp = rospy.Time.now()
-        nav_msg.pos_xy_nav_mode = FlightNav.NO_NAVIGATION
-        nav_msg.psi_nav_mode = FlightNav.NO_NAVIGATION
-        nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
-        self.navigation(nav_msg)
-
-    # TODO: special 
-    def goYawVel(self, target_vel, target_yaw, target_vel_yaw = 0):
+    def targetMotion(self, target_pos, target_yaw = None, target_vel = [0, 0, 0], target_vel_yaw = 0):
 
         nav_msg = FlightNav()
         nav_msg.control_frame = nav_msg.WORLD_FRAME
 
         nav_msg.header.stamp = rospy.Time.now()
         nav_msg.target = FlightNav.COG
-        nav_msg.pos_xy_nav_mode = FlightNav.VEL_MODE
-        nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
-        nav_msg.target_vel_x = target_vel[0]
-        nav_msg.target_vel_y = target_vel[1]
+        mode = FlightNav.POS_VEL_MODE
 
-        nav_msg.yaw_nav_mode = FlightNav.POS_VEL_MODE
-        target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
-        nav_msg.target_yaw = target_yaw
-        nav_msg.target_omega_z = target_vel_yaw
+        if target_vel[0] == 0 and target_vel[1] == 0 and target_vel[2] == 0:
+            mode = FlightNav.POS_MODE
 
-        self.target_yaw_ = target_yaw
-
-        self.nav_pub_.publish(nav_msg)
-
-    # TODO: extend to SE(3)
-    def goPosVel(self, target_pos, target_vel, target_yaw, target_vel_yaw):
-
-        nav_msg = FlightNav()
-        nav_msg.control_frame = nav_msg.WORLD_FRAME
-
-        nav_msg.header.stamp = rospy.Time.now()
-        nav_msg.target = FlightNav.COG
-        nav_msg.pos_xy_nav_mode = FlightNav.POS_VEL_MODE
-        nav_msg.pos_z_nav_mode = FlightNav.POS_VEL_MODE
+        nav_msg.pos_xy_nav_mode = mode
+        nav_msg.pos_z_nav_mode = mode
         nav_msg.target_pos_x = target_pos[0]
         nav_msg.target_pos_y = target_pos[1]
         nav_msg.target_pos_z = target_pos[2]
         nav_msg.target_vel_x = target_vel[0]
         nav_msg.target_vel_y = target_vel[1]
         nav_msg.target_vel_z = target_vel[2]
-
-        nav_msg.yaw_nav_mode = FlightNav.POS_VEL_MODE
-        target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
-        nav_msg.target_yaw = target_yaw
-        nav_msg.target_omega_z = target_vel_yaw
-
         self.nav_pub_.publish(nav_msg)
 
         self.target_pos_ = target_pos
-        self.target_yaw_ = target_yaw
+
+        if target_yaw is not None:
+            rotation_msg = Odometry()
+            rotation_msg.header.stamp = nav_msg.header.stamp
+            rotation_msg.header.frame_id = "cog"
+            rotation_msg.pose.pose.orientation = ros_np.msgify(Quaternion, quaternion_from_euler(0, 0, target_yaw))
+            rotation_msg.twist.twist.angular.z = target_vel_yaw
+            self.rotation_pub_.publish(rotation_msg)
+            self.target_yaw_ = (target_yaw + np.pi) % (2 * np.pi) - np.pi
 
     # TODO: extend to SE(3)
-    def goPos(self, target_pos, target_yaw, nav_mode = FlightNav.POS_MODE):
+    def goPoseWaitConvergence(self, target_pos, target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, timeout = 30):
+        self.targetMotion(target_pos, target_yaw = target_yaw)
+        start_time = rospy.get_time()
 
-        nav_msg = FlightNav()
-        nav_msg.control_frame = nav_msg.WORLD_FRAME
+        while not self.isConvergent(target_pos, target_yaw, pos_conv_thresh, yaw_conv_thresh):
+            elapsed_time = rospy.get_time() - start_time
+            if elapsed_time > timeout and timeout > 0:
+                return False
 
-        nav_msg.header.stamp = rospy.Time.now()
-        nav_msg.target = FlightNav.COG
-        nav_msg.pos_xy_nav_mode = FlightNav.POS_MODE
-        nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
-        nav_msg.target_pos_x = target_pos[0]
-        nav_msg.target_pos_y = target_pos[1]
-        nav_msg.target_pos_z = target_pos[2]
+            # TODO: use decorator @ to wrap these functions
+            if self.force_skip_:
+                rospy.logwarn("Force skip go pos convergence check")
+                force_skip_ = False
+                return True
 
-        nav_msg.yaw_nav_mode = FlightNav.POS_MODE
-        target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
-        nav_msg.target_yaw = target_yaw
+            if self.halt_task_:
+                rospy.logwarn("Halt the task")
+                return False
+
+            if rospy.is_shutdown():
+                return False
+
+            rospy.sleep(0.1)
+
+        return True
 
 
-        self.nav_pub_.publish(nav_msg)
-
-        self.target_pos_ = target_pos
-        self.target_yaw_ = target_yaw
-
-    # TODO1: extend to SE(3)
-    # TODO2: allow seperate axis check, or arbirary direction (i.e., not only x,y,z axes)
-    def isConvergent(self, target_pos, target_yaw, pos_conv_thresh, yaw_conv_thresh, att_conv_thresh=0.06):
+    # TODO: allow seperate axis check, or arbirary direction (i.e., not only x,y,z axes)
+    def isConvergent(self, target_pos, target_yaw, pos_conv_thresh, yaw_conv_thresh):
 
         current_yaw = self.getCogRPY()[2]
         current_vel = self.getCogLinearVel()
@@ -283,33 +262,6 @@ class DragonInterface:
             return True
         else:
             return False
-
-    # TODO: extend to SE(3)
-    def goPosWaitConvergence(self, target_pos, target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, att_conv_thresh = 0.06, timeout = 30):
-        self.goPos(target_pos, target_yaw)
-        start_time = rospy.get_time()
-
-        while not self.isConvergent(target_pos, target_yaw, pos_conv_thresh, yaw_conv_thresh, att_conv_thresh):
-            elapsed_time = rospy.get_time() - start_time
-            if elapsed_time > timeout and timeout > 0:
-                return False
-
-            # TODO: use decorator @ to wrap these functions
-            if self.force_skip_:
-                rospy.logwarn("Force skip go pos convergence check")
-                force_skip_ = False
-                return True
-
-            if self.halt_task_:
-                rospy.logwarn("Halt the task")
-                return False
-
-            if rospy.is_shutdown():
-                return False
-
-            rospy.sleep(0.1)
-
-        return True
 
     def getTF(self, frame_id, wait=0.5, parent_frame_id='world'):
         trans = self.tf_buffer.lookup_transform(parent_frame_id, frame_id, rospy.Time.now(), rospy.Duration(wait))
