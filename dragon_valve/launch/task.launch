@@ -5,6 +5,8 @@
   <arg name="simulation" default="False" />
   <arg name="estimate_mode"  default= "1" />
   <arg name="headless" default="True" />
+  <arg name="valve_pitch_angle" default="0" /> <!-- deg -->
+  <arg name="valve_friction" default="1.0" /> <!-- Nm -->
 
   <!-- <include file="$(find dragon_valve)/launch/include/dragon_bringup.launch" > -->
   <!--   <arg name="real_machine" value="$(arg real_machine)" /> -->
@@ -19,8 +21,8 @@
   </node>
 
   <group if="$(eval arg('simulation') and not arg('real_machine'))">
-    <param name="valve/robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf" />
-    <node pkg="gazebo_ros" type="spawn_model" name="valve_spawn" args="-param valve/robot_description -urdf -x 2 -y 1 -z 0 -model valve" />
+    <param name="valve/robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf valve_pitch_angle:=$(arg valve_pitch_angle) valve_friction:=$(arg valve_friction)" />
+    <node pkg="gazebo_ros" type="spawn_model" name="valve_spawn" args="-param valve/robot_description -urdf -x 3 -y 1 -z 0 -model valve" />
     <node pkg="topic_tools" type="transform" name="topic_transform" args="/valve/odom /valve/mocap/pose geometry_msgs/PoseStamped 'geometry_msgs.msg.PoseStamped(header=m.header,pose=m.pose.pose)' --import geometry_msgs nav_msgs" />
     <!-- <node pkg="rostopic" type="rostopic" name="valve_pose" args="pub -r 10 /valve/mocap/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: base_link}, pose: {position: {x: 2.0, y: 1.0, z: 0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, x: 0.0}}}'"/> -->
   </group>

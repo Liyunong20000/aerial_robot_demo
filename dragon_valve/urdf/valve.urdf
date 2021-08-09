@@ -2,8 +2,11 @@
 <robot
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="valve" >
 
-  <xacro:property name="valve_height" value="0.3" />
-  <xacro:property name="stem_length" value="0.3" />
+
+  <xacro:arg name="valve_pitch_angle" default="180" /> <!-- deg -->
+  <xacro:arg name="valve_friction" default="1.0" /> <!-- Nm -->
+  <xacro:property name="valve_height" value="${0.3 + $(arg valve_pitch_angle) * 0.01}" />
+
 
   <material name="red">
     <color rgba="1 0 0 1"/>
@@ -13,68 +16,126 @@
     <color rgba="0 0 0 1"/>
   </material>
 
-  <link name="base">
-    <visual>
-      <origin xyz="0 0 ${valve_height * 0.5}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${valve_height}" radius="0.1"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 ${valve_height * 0.5}" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${valve_height}" radius="0.1"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="0 0 ${valve_height * 0.5}" rpy="0 0 0"/>
-      <mass value="20"/>
-      <inertia
-          ixx="0.05" ixy="0.0" ixz="0.0"
-          iyy="0.05" iyz="0.0"
-          izz="0.1"/>
-    </inertial>
-  </link>
+  <material name="grey">
+    <color rgba="0.3 0.3 0.3 1"/>
+  </material>
 
-  <joint name="stem_joint" type="fixed">
-    <parent link="base"/>
-    <child link="stem"/>
-    <origin xyz="0 0 ${valve_height}" rpy="0 0 0"/>
+
+  <xacro:property name="main_pipe_length" value="2.0" />
+  <xacro:property name="main_pipe_mass" value="10.0" />
+  <xacro:property name="pipe_radius" value="0.05" />
+
+  <xacro:macro name="pipe_model" params="name mass length radius height direction color:=grey">
+    <link name="${name}">
+      <visual>
+        <origin xyz="0 0 ${height}" rpy="${direction} 0 0"/>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}"/>
+        </geometry>
+        <material name="${color}"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${height}" rpy="${direction} 0 0"/>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 ${height}" rpy="${direction} 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+            ixx="${0.25 * mass * radius * radius}" ixy="0.0" ixz="0.0"
+            iyy="${0.25 * mass * radius * radius}" iyz="0.0"
+            izz="${0.5 * mass * radius * radius}"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+
+  <xacro:pipe_model name="main_pipe" mass="${main_pipe_mass}" length="${main_pipe_length}" radius="0.05" height="${valve_height}" direction="${pi/2}" />
+  <xacro:pipe_model name="sub_pipe1" mass="${main_pipe_mass * main_pipe_length * valve_height}" length="${valve_height}" height="${valve_height/2}" radius="${pipe_radius}"  direction="0" />
+  <xacro:pipe_model name="sub_pipe2" mass="${main_pipe_mass * main_pipe_length * valve_height}" length="${valve_height}" height="${valve_height/2}" radius="${pipe_radius}"  direction="0" />
+  <joint name="pipe_joint1" type="fixed">
+    <parent link="main_pipe"/>
+    <child link="sub_pipe1"/>
+    <origin xyz="0 ${main_pipe_length * 0.5 - pipe_radius} 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="pipe_joint2" type="fixed">
+    <parent link="main_pipe"/>
+    <child link="sub_pipe2"/>
+    <origin xyz="0 -${main_pipe_length * 0.5 - pipe_radius} 0" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
-  <link name="stem">
-    <visual>
+
+  <xacro:macro name="mount_model" params="parent">
+    <xacro:property name="height" value="0.05" />
+    <xacro:property name="radius" value="${valve_height * 0.5}" />
+    <xacro:property name="mass" value="20" />
+
+    <joint name="${parent}_mount_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${parent}_mount"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${stem_length}" radius="0.03"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${stem_length}" radius="0.03"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.5"/>
-      <inertia
-          ixx="0.000112" ixy="0.0" ixz="0.0"
-          iyy="0.000112" iyz="0.0"
-          izz="0.000225"/>
-    </inertial>
-  </link>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="${parent}_mount">
+      <visual>
+        <origin xyz="0 0 ${height * 0.5}" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="${height}" radius="${radius}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${height * 0.5}" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="${height}" radius="${radius}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 ${height * 0.5}" rpy="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+            ixx="${0.25 * mass * radius * radius}" ixy="0.0" ixz="0.0"
+            iyy="${0.25 * mass * radius * radius}" iyz="0.0"
+            izz="${0.5 * mass * radius * radius}"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+  <xacro:mount_model parent = "sub_pipe1" />
+  <xacro:mount_model parent = "sub_pipe2" />
+
+
+  <!-- valve -->
+  <xacro:pipe_model name="valve" mass="5" length="${pipe_radius * 4}" radius="${pipe_radius * 1.5}" height="0" direction="0" color="red"/>
+  <joint name="valve_pipe_joint" type="fixed">
+    <parent link="main_pipe"/>
+    <child link="valve"/>
+    <origin xyz="0 0 ${valve_height}" rpy="0 ${ $(arg valve_pitch_angle) / 180 * pi} 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <xacro:property name="stem_length" value="0.3" />
+  <xacro:pipe_model name="stem" mass="0.5" length="${stem_length}" radius="0.03" height="0" direction="0" color="black"/>
+  <joint name="stem_joint" type="fixed">
+    <parent link="valve"/>
+    <child link="stem"/>
+    <origin xyz="0 0 ${pipe_radius * 2}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
 
   <joint name="valve_joint" type="continuous">
-    <dynamics damping="0.0" friction="1.0"/> <!-- 1Nm -->
+    <dynamics damping="0.0" friction="$(arg valve_friction)"/>
     <parent link="stem"/>
     <child link="handle"/>
     <origin xyz="0 0 ${stem_length * 0.5 + 0.02}" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
   </joint>
+
 
   <link name="handle">
     <visual>
@@ -100,7 +161,28 @@
     </inertial>
   </link>
 
-  <gazebo reference="base">
+  
+  <gazebo reference="main_pipe">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo reference="sub_pipe1">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo reference="sub_pipe2">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo reference="sub_pipe1_mount">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="sub_pipe2_mount">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="valve">
     <material>Gazebo/Red</material>
   </gazebo>
 
