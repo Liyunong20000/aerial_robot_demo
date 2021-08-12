@@ -34,10 +34,11 @@ class DragonInterface:
         self.baselink_odom_ = Odometry()
         self.flight_state_ = self.ARM_OFF_STATE
         self.target_pos_ = np.array([0,0,0])
-        self.target_yaw_ = 0
 
         self.robot_name = rospy.get_param('~robot_name', 'dragon')
         self.mass = rospy.get_param('~robot_mass', 7.3) # TODO: get from robot model
+        self.default_pos_thresh = rospy.get_param('~default_pos_thresh', 0.1) # m
+        self.default_rot_thresh = rospy.get_param('~default_rot_thresh', 0.05) # rad
         self.joint_state_sub_ = rospy.Subscriber('joint_states', JointState, self.jointStateCallback)
         self.joint_ctrl_pub_ = rospy.Publisher('joints_ctrl', JointState, queue_size = 1)
         self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
@@ -163,10 +164,7 @@ class DragonInterface:
     def getTargetPos(self):
         return self.target_pos_
 
-    def getTargetYaw(self):
-        return self.target_yaw_
-
-    def targetMotion(self, target_pos, target_yaw = None, target_vel = [0, 0, 0], target_vel_yaw = 0):
+    def targetMotion(self, pos, rot = None, linear_vel = [0, 0, 0], angular_vel = [0, 0, 0]):
 
         nav_msg = FlightNav()
         nav_msg.control_frame = nav_msg.WORLD_FRAME
@@ -175,36 +173,40 @@ class DragonInterface:
         nav_msg.target = FlightNav.COG
         mode = FlightNav.POS_VEL_MODE
 
-        if target_vel[0] == 0 and target_vel[1] == 0 and target_vel[2] == 0:
+        if linear_vel[0] == 0 and linear_vel[1] == 0 and linear_vel[2] == 0:
             mode = FlightNav.POS_MODE
 
         nav_msg.pos_xy_nav_mode = mode
         nav_msg.pos_z_nav_mode = mode
-        nav_msg.target_pos_x = target_pos[0]
-        nav_msg.target_pos_y = target_pos[1]
-        nav_msg.target_pos_z = target_pos[2]
-        nav_msg.target_vel_x = target_vel[0]
-        nav_msg.target_vel_y = target_vel[1]
-        nav_msg.target_vel_z = target_vel[2]
+        nav_msg.target_pos_x = pos[0]
+        nav_msg.target_pos_y = pos[1]
+        nav_msg.target_pos_z = pos[2]
+        nav_msg.target_vel_x = linear_vel[0]
+        nav_msg.target_vel_y = linear_vel[1]
+        nav_msg.target_vel_z = linear_vel[2]
         self.nav_pub_.publish(nav_msg)
 
-        self.target_pos_ = target_pos
+        self.target_pos_ = pos
 
-        if target_yaw is not None:
+        if rot is not None:
             rotation_msg = Odometry()
             rotation_msg.header.stamp = nav_msg.header.stamp
-            rotation_msg.header.frame_id = "cog"
-            rotation_msg.pose.pose.orientation = ros_np.msgify(Quaternion, quaternion_from_euler(0, 0, target_yaw))
-            rotation_msg.twist.twist.angular.z = target_vel_yaw
+            rotation_msg.header.frame_id = "baselink"
+            rotation_msg.pose.pose.orientation = ros_np.msgify(Quaternion, rot)
+            rotation_msg.twist.twist.angular = ros_np.msgify(Vector3, np.array(angular_vel))
             self.rotation_pub_.publish(rotation_msg)
-            self.target_yaw_ = (target_yaw + np.pi) % (2 * np.pi) - np.pi
+            #self.target_yaw_ = (target_yaw + np.pi) % (2 * np.pi) - np.pi
 
     # TODO: extend to SE(3)
-    def goPoseWaitConvergence(self, target_pos, target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, timeout = 30):
-        self.targetMotion(target_pos, target_yaw = target_yaw)
+    def goPoseWaitConvergence(self, pos, rot, pos_thresh = 0.1, rot_thresh = 0.1, timeout = 30, check_func = None):
+
+        self.targetMotion(pos, rot = rot)
         start_time = rospy.get_time()
 
-        while not self.isConvergent(target_pos, target_yaw, pos_conv_thresh, yaw_conv_thresh):
+        if check_func is None:
+            check_func = self.posYawConvergenceCheck
+
+        while not check_func(pos, rot, pos_thresh, rot_thresh):
             elapsed_time = rospy.get_time() - start_time
             if elapsed_time > timeout and timeout > 0:
                 return False
@@ -226,16 +228,41 @@ class DragonInterface:
 
         return True
 
+    def posYawConvergenceCheck(self, target_pos, target_rot, pos_thresh, rot_thresh):
+        """
+        if isinstance(pos_thresh, float):
+            pos_thresh = [pos_thresh] * 3
+        elif isinstance(pos_thresh, list):
+            if len(pos_thresh) != 3:
+                rospy.logerr_throttle(1.0, "wrong number of pos_thresh: {}, should be 3".format(pos_thresh))
+                pos_thresh = [self.default_pos_thresh] * 3
+        else:
+            rospy.logerr_throttle(1.0, "wrong type of pos thresh")
+            pos_thresh = [self.default_pos_thresh] * 3
+        """
 
-    # TODO: allow seperate axis check, or arbirary direction (i.e., not only x,y,z axes)
-    def isConvergent(self, target_pos, target_yaw, pos_conv_thresh, yaw_conv_thresh):
+        if isinstance(pos_thresh, list):
+            if len(pos_thresh) != 3:
+                rospy.logerr_thpostle(1.0, "wrong number of pos_thresh: {}, should be 3".format(pos_thresh))
+                pos_thresh = self.default_pos_thresh
+            else:
+                pos_thresh = pos_thresh[2]
 
-        current_yaw = self.getCogRPY()[2]
+        if isinstance(rot_thresh, list):
+            if len(rot_thresh) != 3:
+                rospy.logerr_throttle(1.0, "wrong number of rot_thresh: {}, should be 3".format(rot_thresh))
+                rot_thresh = self.default_rot_thresh
+            else:
+                rot_thresh = rot_thresh[2]
+
+        target_yaw = euler_from_quaternion(target_rot)[2]
+
+        current_yaw = self.getBaselinkRPY()[2]
         current_vel = self.getCogLinearVel()
 
         delta_pos = target_pos - self.getCogPos()
 
-        delta_yaw = target_yaw - self.getCogRPY()[2]
+        delta_yaw = target_yaw - current_yaw
         if delta_yaw > np.pi:
             delta_yaw -= np.pi * 2
         elif delta_yaw < -np.pi:
@@ -255,10 +282,7 @@ class DragonInterface:
             rospy.loginfo_throttle(0.5, "\n" + text.text)
             self.nav_debug_pub_.publish(text)
 
-
-        # TODO: check the error round the valve normal, not all 3D position. Same with oritation
-        # use decorator: https://qiita.com/_rdtr/items/d3bc1a8d4b7eb375c368
-        if np.linalg.norm(delta_pos) < pos_conv_thresh and abs(delta_yaw) < yaw_conv_thresh:
+        if np.linalg.norm(delta_pos) < pos_thresh and abs(delta_yaw) < rot_thresh:
             return True
         else:
             return False
@@ -312,7 +336,7 @@ class DragonInterface:
             clear_external_wrench = rospy.ServiceProxy('clear_external_wrench', BodyRequest)
             resp = clear_external_wrench(body_name = wrench_name)
         except rospy.ServiceException as e:
-            rospy.logerror("Service call failed: {}".format(e))
+            rospy.logerr("Service call failed: {}".format(e))
 
     def estimatedExternalWrenchCallback(self, msg):
         self.est_wrench = msg.wrench

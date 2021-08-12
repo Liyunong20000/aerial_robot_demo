@@ -5,7 +5,7 @@ debug_view: true # for debug in dragon interface (gopos convergence)
 valve_type: 3bridges # x in 'xbriges' denotes the number of bridges from the stem center to handle ring.
 valve_pose_topic: /valve/mocap/pose
 
-baselink_name: baselink
+baselink_name: fc
 cog_name: cog
 end_effector_name: gripper
 
@@ -42,7 +42,7 @@ manipulate:
   torque_adjust_roll_k: 0.2
   torque_adjust_yaw_k: 1.0
   torque_limit: 3.0
-  yaw_velocity_thresh: 0.1 # diff between true and target yaw velocity
+  yaw_velocity_thresh: 0.05 #0.1 # diff between true and target yaw velocity
 
 finish:
   tip_z_offset: 0.2
