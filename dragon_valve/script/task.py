@@ -329,6 +329,10 @@ class Manipulate(Approach):
         self.rate = rospy.get_param('~manipulate/rate', 20.0) # hz
         self.action = rospy.get_param('~manipulate/action', 'open')
         self.fixed_traj = rospy.get_param('~manipulate/fixed_traj', False)
+        self.debug_mode = rospy.get_param('~debug_mode', False)
+
+        if self.debug_mode:
+            self.fixed_traj = True
 
     def execute(self, userdata):
 
@@ -354,7 +358,8 @@ class Manipulate(Approach):
         est_wrench_offset = userdata.est_wrench_offset
         valve_force = [0,0,0] # [x,y,z] w.r.t world frame
         valve_torque = userdata.init_torque
-        self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
+        if not self.debug_mode:
+            self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
         while True:
             curr_yaw = self.robot.getBaselinkRPY()[2] # TODO: do we need Baselink?
@@ -428,7 +433,8 @@ class Manipulate(Approach):
                 rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the limit of torque {}, finish manipulation".format(valve_torque[2]))
                 break
 
-            self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
+            if not self.debug_mode:
+                self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
             prev_yaw = curr_yaw
             rospy.sleep(delta_t)
@@ -437,7 +443,8 @@ class Manipulate(Approach):
         target_rot = quaternion_from_euler(0, 0, self.robot.getBaselinkRPY()[2])
         self.robot.targetMotion(self.robot.getCogPos(), rot = target_rot)
 
-        self.robot.clearExternalWrench('valve')
+        if not self.debug_mode:
+            self.robot.clearExternalWrench('valve')
         rospy.sleep(2.0) # for final convergence to the end pose
         return "succeeded"
 
@@ -492,6 +499,7 @@ def main():
 
 
     debug_view = rospy.get_param('~debug_view', True)
+    debug_mode = rospy.get_param('~debug_mode', True)
     robot = DragonInterface(debug_view)
 
 
@@ -531,7 +539,7 @@ def main():
                                               'est_wrench_offset':'est_wrench_offset'})
 
         smach.StateMachine.add('Approach', sm_approach,
-                               transitions={'succeeded':'Contact',
+                               transitions={'succeeded': 'Contact' if not debug_mode else 'Manipulate',
                                             'failed':'Fail'},
                                remapping={'approach_cog_pos':'approach_cog_pos',
                                           'approach_cog_yaw':'approach_cog_yaw',
