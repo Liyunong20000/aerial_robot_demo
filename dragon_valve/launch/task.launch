@@ -5,9 +5,11 @@
   <arg name="simulation" default="False" />
   <arg name="estimate_mode"  default= "1" />
   <arg name="headless" default="True" />
+  <arg name="only_yaw" default="false" doc="whether only use yaw motion to manipulate valve "/>
   <arg name="valve_pitch_angle" default="0" doc="the diction of the valve normal axis in gazebo model" />
   <arg name="valve_friction" default="1.0" doc="the friction of valve in gazebo model"/>
   <arg name="debug" default="false" doc="debug mode with valve, only check the trajectory following performance "/>
+
 
   <!-- <include file="$(find dragon_valve)/launch/include/dragon_bringup.launch" > -->
   <!--   <arg name="real_machine" value="$(arg real_machine)" /> -->
@@ -20,13 +22,14 @@
   <node pkg="dragon_valve" type="task.py" name="valve_task_motion" output="screen" ns="dragon">
     <rosparam file="$(find dragon_valve)/config/task.yaml" command="load" />
     <param name="debug_mode" value="$(arg debug)" />
+    <param name="only_yaw" value="$(arg only_yaw)" />
   </node>
 
   <group if="$(eval arg('simulation') and not arg('real_machine'))">
-    <param name="valve/robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf valve_pitch_angle:=$(arg valve_pitch_angle) valve_friction:=$(arg valve_friction)" />
-    <node pkg="gazebo_ros" type="spawn_model" name="valve_spawn" args="-param valve/robot_description -urdf -x 3 -y 1 -z 0 -model valve" unless="$(arg debug)"/>
-    <node pkg="topic_tools" type="transform" name="topic_transform" args="/valve/odom /valve/mocap/pose geometry_msgs/PoseStamped 'geometry_msgs.msg.PoseStamped(header=m.header,pose=m.pose.pose)' --import geometry_msgs nav_msgs"  launch-prefix="bash -c 'sleep 3; $0 $@' " />
-    <node pkg="rostopic" type="rostopic" name="valve_pose" args="pub -r 10 /valve/mocap/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: base_link}, pose: {position: {x: 2.0, y: 1.0, z: 0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, x: 0.0}}}'" if="$(arg debug)"/>
+    <param name="valve/robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf valve_pitch_angle:=$(arg valve_pitch_angle) valve_friction:=$(arg valve_friction) no_collision:=$(arg debug)" />
+    <node pkg="gazebo_ros" type="spawn_model" name="valve_spawn" args="-param valve/robot_description -urdf -x 3 -y 1 -z 0 -Y 3.64 -model valve" />
+    <node pkg="topic_tools" type="transform" name="topic_transform" args="/valve/odom /valve/mocap/pose geometry_msgs/PoseStamped 'geometry_msgs.msg.PoseStamped(header=m.header,pose=m.pose.pose)' --import geometry_msgs nav_msgs"  launch-prefix="bash -c 'sleep 3; $0 $@' "/>
+    <!-- <node pkg="rostopic" type="rostopic" name="valve_pose" args="pub -r 10 /valve/mocap/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: base_link}, pose: {position: {x: 2.0, y: 1.0, z: 0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, x: 0.0}}}'" if="$(arg debug)"/> -->
   </group>
 
 </launch>
