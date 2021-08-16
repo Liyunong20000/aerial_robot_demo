@@ -35,11 +35,11 @@ contact:
 manipulate:
   angular_velocity: 0.8 #0.5 # rad/s
   round_num: 2
-  rate: 20.0 # Hz
-  action: open # workaround to designate the open/close action
+  rate: 20.0 # Hz, 20 Hz is better than 40Hz, since the control rate is 40Hz, check with the yaw control terms (I terms) in upward valve case
+  action: open #open # workaround to designate the open/close action
   fixed_traj: false # whether fixed the radius of the manipulating circle trajectory
   roll_moment_thresh: 0.2
-  torque_adjust_roll_k: 0.2
+  torque_adjust_roll_k: 0.01
   torque_adjust_yaw_k: 1.0
   torque_limit: 3.0
   yaw_velocity_thresh: 0.05 #0.1 # diff between true and target yaw velocity
