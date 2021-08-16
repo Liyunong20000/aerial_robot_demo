@@ -11,7 +11,7 @@ from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from std_srvs.srv import SetBool, SetBoolRequest
 import tf2_ros
-from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped, Quaternion
+from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped, Quaternion, QuaternionStamped
 from sensor_msgs.msg import Joy
 from gazebo_msgs.srv import ApplyBodyWrenchRequest, BodyRequest
 
@@ -45,6 +45,7 @@ class DragonInterface:
         self.baselink_odom_sub_ = rospy.Subscriber('uav/baselink/odom', Odometry, self.baselinkOdomCallback)
         self.nav_pub_ = rospy.Publisher('uav/nav', FlightNav, queue_size = 1)
         self.rotation_pub_ = rospy.Publisher('target_rotation_motion', Odometry, queue_size = 1)
+        self.final_rotation_pub_ = rospy.Publisher('final_target_baselink_rot', QuaternionStamped, queue_size = 1) # TODO: change the name
         self.start_pub_ = rospy.Publisher('teleop_command/start', Empty, queue_size = 1)
         self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
@@ -132,7 +133,7 @@ class DragonInterface:
         return ros_np.numpify(self.baselink_odom_.pose.pose.position)
 
     def getBaselinkRot(self):
-        return quaternion_matrix(ros_np.numpify(self.baselink_odom_.pose.pose.orientation))
+        return ros_np.numpify(self.baselink_odom_.pose.pose.orientation)
 
     def getBaselinkRPY(self):
         return euler_from_quaternion(ros_np.numpify(self.baselink_odom_.pose.pose.orientation))
@@ -147,7 +148,7 @@ class DragonInterface:
         return ros_np.numpify(self.cog_odom_.pose.pose.position)
 
     def getCogRot(self):
-        return quaternion_matrix(ros_np.numpify(self.cog_odom_.pose.pose.orientation))
+        return ros_np.numpify(self.cog_odom_.pose.pose.orientation)
 
     def getCogRPY(self):
         return euler_from_quaternion(ros_np.numpify(self.cog_odom_.pose.pose.orientation))
@@ -164,7 +165,7 @@ class DragonInterface:
     def getTargetPos(self):
         return self.target_pos_
 
-    def targetMotion(self, pos, rot = None, linear_vel = [0, 0, 0], angular_vel = [0, 0, 0]):
+    def targetMotion(self, pos, rot = None, linear_vel = None, angular_vel = None):
 
         nav_msg = FlightNav()
         nav_msg.control_frame = nav_msg.WORLD_FRAME
@@ -173,8 +174,9 @@ class DragonInterface:
         nav_msg.target = FlightNav.COG
         mode = FlightNav.POS_VEL_MODE
 
-        if linear_vel[0] == 0 and linear_vel[1] == 0 and linear_vel[2] == 0:
+        if linear_vel is None:
             mode = FlightNav.POS_MODE
+            linear_vel = np.array([0, 0, 0])
 
         nav_msg.pos_xy_nav_mode = mode
         nav_msg.pos_z_nav_mode = mode
@@ -189,13 +191,18 @@ class DragonInterface:
         self.target_pos_ = pos
 
         if rot is not None:
-            rotation_msg = Odometry()
-            rotation_msg.header.stamp = nav_msg.header.stamp
-            rotation_msg.header.frame_id = "cog"
-            rotation_msg.pose.pose.orientation = ros_np.msgify(Quaternion, rot)
-            rotation_msg.twist.twist.angular = ros_np.msgify(Vector3, np.array(angular_vel))
-            self.rotation_pub_.publish(rotation_msg)
-            #self.target_yaw_ = (target_yaw + np.pi) % (2 * np.pi) - np.pi
+            if angular_vel is None:
+                rotation_msg = QuaternionStamped()
+                rotation_msg.header.stamp = nav_msg.header.stamp
+                rotation_msg.quaternion = ros_np.msgify(Quaternion, rot)
+                self.final_rotation_pub_.publish(rotation_msg)
+            else:
+                rotation_msg = Odometry()
+                rotation_msg.header.stamp = nav_msg.header.stamp
+                rotation_msg.header.frame_id = "baselink"
+                rotation_msg.pose.pose.orientation = ros_np.msgify(Quaternion, rot)
+                rotation_msg.twist.twist.angular = ros_np.msgify(Vector3, np.array(angular_vel))
+                self.rotation_pub_.publish(rotation_msg)
 
     # TODO: extend to SE(3)
     def goPoseWaitConvergence(self, pos, rot, pos_thresh = 0.1, rot_thresh = 0.1, timeout = 30, check_func = None):
@@ -255,7 +262,10 @@ class DragonInterface:
             else:
                 rot_thresh = rot_thresh[2]
 
-        target_yaw = euler_from_quaternion(target_rot)[2]
+        if target_rot is None:
+            target_yaw = self.getBaselinkRPY()[2]
+        else:
+            target_yaw = euler_from_quaternion(target_rot)[2]
 
         current_yaw = self.getBaselinkRPY()[2]
         current_vel = self.getCogLinearVel()
@@ -277,7 +287,7 @@ class DragonInterface:
             text.text_size = 12
             text.line_width = 2
             text.font = "DejaVu Sans Mono"
-            text.text = 'CoG Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n  SetPoint\n  x: {:.4g} y: {:.4g} z: {:.4g} yaw: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), target_pos[0], target_pos[1], target_pos[2], target_yaw)
+            text.text = 'CoG Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n SetPoint\n  x: {:.4g} y: {:.4g} z: {:.4g} yaw: {:.4g}\n CurrentPoint\n  x: {:.4g} y: {:.4g} z: {:.4g} yaw: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), target_pos[0], target_pos[1], target_pos[2], target_yaw, self.getCogPos()[0], self.getCogPos()[1], self.getCogPos()[2], current_yaw)
 
             rospy.loginfo_throttle(0.5, "\n" + text.text)
             self.nav_debug_pub_.publish(text)
