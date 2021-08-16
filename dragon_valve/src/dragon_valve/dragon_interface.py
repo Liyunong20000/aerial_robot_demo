@@ -191,7 +191,7 @@ class DragonInterface:
         if rot is not None:
             rotation_msg = Odometry()
             rotation_msg.header.stamp = nav_msg.header.stamp
-            rotation_msg.header.frame_id = "baselink"
+            rotation_msg.header.frame_id = "cog"
             rotation_msg.pose.pose.orientation = ros_np.msgify(Quaternion, rot)
             rotation_msg.twist.twist.angular = ros_np.msgify(Vector3, np.array(angular_vel))
             self.rotation_pub_.publish(rotation_msg)
