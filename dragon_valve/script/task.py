@@ -523,6 +523,8 @@ class Manipulate(Approach):
         valve_force = [0,0,0] # [x,y,z] w.r.t world frame
         valve_torque = userdata.init_torque
 
+        self.stable_manipulate = False
+
         last_winding_t = -1000
 
         if not self.debug_mode:
@@ -682,8 +684,12 @@ class Manipulate(Approach):
                                                                              translation_matrix(np.array([0, 0, adjust_torque]))))
 
             # 4.2 adjust torquce according to yaw velocity
-            delta_vel = turn_vel - translation_from_matrix(concatenate_matrices(quaternion_matrix(quaternion_inverse(init_valve_rot)),
-                                                                                translation_matrix(self.robot.getCogAngularVel())))[2]
+            curr_vel = translation_from_matrix(concatenate_matrices(quaternion_matrix(quaternion_inverse(init_valve_rot)),
+                                                                    translation_matrix(self.robot.getCogAngularVel())))[2]
+            delta_vel = turn_vel - curr_vel
+            if np.abs(curr_vel) > 0.8 * np.abs(turn_vel) and not self.stable_manipulate:
+                rospy.loginfo("the manipulation is stable")
+                self.stable_manipulate = True
 
 
             if np.abs(delta_vel) < self.yaw_velocity_thresh:
@@ -701,6 +707,11 @@ class Manipulate(Approach):
             if np.abs(np.linalg.norm(valve_torque)) > self.torque_limit and not self.debug_mode:
                 rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the limit of torque {}, finish manipulation".format(valve_torque))
                 break
+
+            if self.stable_manipulate and np.abs(curr_vel) < 0.3 * np.abs(turn_vel):
+                rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the stuck, the turning velocity {}, finish manipulation".format(curr_vel))
+                break
+
 
             if not self.debug_mode:
                 self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
