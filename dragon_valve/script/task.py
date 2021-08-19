@@ -167,12 +167,12 @@ class Joint(BaseState):
         joint_state = JointState()
         joint_state.name = ['joint1_pitch']
         valve_coord_z_axis = quaternion_matrix(ros_np.numpify(self.robot.getValvePose().orientation))[:3, 2]
-        if valve_coord_z_axis[2] > 0: # upward
-            joint_state.position = [np.pi / 2]
-            userdata.reverse_joint = False
-        else:  # downward
+        if valve_coord_z_axis[2] < -0.001: # downward
             joint_state.position = [-np.pi / 2]
             userdata.reverse_joint = True
+        else:  # upward
+            joint_state.position = [np.pi / 2]
+            userdata.reverse_joint = False
         self.robot.setJointAngle(joint_state)
 
 
@@ -252,6 +252,15 @@ class Approach(BaseState):
             # only extract yaw angle
             yaw = euler_from_quaternion(target_rot)[2]
             target_rot = quaternion_from_euler(0, 0, yaw)
+
+
+        if self.motion == "approach":
+            # first change the rotation if the change of rotation is large
+            roll = euler_from_quaternion(target_rot)[0]
+            pitch = euler_from_quaternion(target_rot)[1]
+            if np.abs(pitch) > np.pi/4 or np.abs(roll) > np.pi/4: # 45 deg
+                self.robot.targetMotion(self.robot.getCogPos(), rot = target_rot)
+                rospy.sleep(max(np.abs(roll), np.abs(pitch)) / (np.pi/2) * 5) # max is 5 second
 
         conv_flag = self.robot.goPoseWaitConvergence(target_pos, target_rot, pos_thresh = self.pos_conv_thresh, \
                                                      rot_thresh = self.yaw_conv_thresh, timeout = 30, check_func = self.convergnet_func)
@@ -457,6 +466,8 @@ class Manipulate(Approach):
         self.action = rospy.get_param('~manipulate/action', 'open')
         self.fixed_traj = rospy.get_param('~manipulate/fixed_traj', False)
         self.debug_mode = rospy.get_param('~debug_mode', False)
+        self.wind_start_delay = rospy.get_param('~manipulate/wind_start_delay', 2.0) # sec
+        self.wind_duration = rospy.get_param('~manipulate/wind_duration', 3.0) # sec
 
         if self.debug_mode:
             self.fixed_traj = True
@@ -471,6 +482,10 @@ class Manipulate(Approach):
         init_valve_pose = ros_np.numpify(self.robot.getValvePose())
         init_valve_pos = translation_from_matrix(init_valve_pose)
         init_valve_rot = quaternion_from_matrix(init_valve_pose)
+        valve_z_axis = quaternion_matrix(init_valve_rot)[:3, 2]
+        gimbal_wind_flag = False
+        if np.abs(valve_z_axis[2]) < np.cos(70.0 / 180 * np.pi): # < 70deg, need wind rotor
+            gimbal_wind_flag = True
 
         target_pos_z = userdata.init_grasp_cog_pos[2]
         if not userdata.only_yaw:
@@ -508,10 +523,41 @@ class Manipulate(Approach):
         valve_force = [0,0,0] # [x,y,z] w.r.t world frame
         valve_torque = userdata.init_torque
 
+        last_winding_t = -1000
+
         if not self.debug_mode:
             self.robot.addExternalWrench('valve', 'cog', valve_force, valve_torque)
 
         while True:
+
+            # 0. check whether need to wind
+            if gimbal_wind_flag:
+                g_vector =  translation_from_matrix(concatenate_matrices(quaternion_matrix(quaternion_inverse(prev_target_rot)),
+                                                                         translation_matrix(np.array([0,0,-1]))))
+
+                start_wind = False
+                phi = np.arctan2(g_vector[1], g_vector[0])
+                delta_angle = np.pi/2 - 0.6 # heuristic parameter
+                if phi > delta_angle - 0.05 and phi < delta_angle + 0.05  and self.action == 'open':
+                    start_wind = True
+                if phi > -delta_angle - 0.05 and phi < -delta_angle + 0.05 and self.action == 'close':
+                    start_wind = True
+
+                if start_wind and rospy.get_time() - last_winding_t > np.pi / self.angular_velocity:
+                    rospy.loginfo("start winding gimbal1 roll")
+
+                    # hovering
+                    self.robot.targetMotion(self.robot.getCogPos(), rot = self.robot.getBaselinkRot())
+                    self.robot.clearExternalWrench('valve')
+
+                    rospy.sleep(self.wind_start_delay) # sleep to wait the stable hovering
+
+                    # send wind command for gimbal1_roll (id is 0)
+                    self.robot.windGimbal(0)
+
+                    rospy.sleep(self.wind_duration) # sleep to wait the stable hovering
+                    last_winding_t = rospy.get_time()
+
 
             # 1. rotation and angular velocity
             # Note: yaw is w.r.t. the valve coord (i.e., around the z axis of valve coord)
@@ -703,10 +749,15 @@ class Finish(BaseState):
 
 
         # joint angle
-        joint_state = JointState()
-        joint_state.name = ['joint1_pitch']
-        joint_state.position = [0]
-        self.robot.setJointAngle(joint_state)
+        roll = euler_from_quaternion(self.robot.getBaselinkRot())[0]
+        pitch = euler_from_quaternion(self.robot.getBaselinkRot())[1]
+        if np.abs(pitch) < np.pi/4 and np.abs(roll) < np.pi/4: 
+            joint_state = JointState()
+            joint_state.name = ['joint1_pitch']
+            joint_state.position = [0]
+            self.robot.setJointAngle(joint_state)
+
+
 
         rospy.loginfo_throttle(0.5, self.__class__.__name__ + '_' + self.status + ': back to home')
         self.robot.goPoseWaitConvergence(userdata.init_cog_pos, rot = None, pos_thresh = 0.2)

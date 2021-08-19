@@ -5,7 +5,7 @@ from aerial_robot_msgs.msg import FlightNav, PoseControlPid
 import numpy as np
 import ros_numpy as ros_np
 from tf.transformations import *
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, Int8
 import math
 from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
@@ -57,6 +57,7 @@ class DragonInterface:
         self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
 
         self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest, queue_size = 1)
+        self.gimbal_wind_pub = rospy.Publisher('wind_gimbal', Int8, queue_size = 1)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -363,3 +364,8 @@ class DragonInterface:
 
     def getControlPid(self):
         return self.control_pid
+
+    def windGimbal(self, gimbal):
+        msg = Int8()
+        msg.data = gimbal
+        self.gimbal_wind_pub.publish(msg)
