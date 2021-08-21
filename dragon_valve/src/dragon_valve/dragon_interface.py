@@ -15,7 +15,7 @@ from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped, Quate
 from sensor_msgs.msg import Joy
 from gazebo_msgs.srv import ApplyBodyWrenchRequest, BodyRequest
 
-class DragonInterface:
+class DragonInterface(object):
     def __init__(self, debug_view = False):
 
         # flight states:
@@ -58,6 +58,7 @@ class DragonInterface:
 
         self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest, queue_size = 1)
         self.gimbal_wind_pub = rospy.Publisher('wind_gimbal', Int8, queue_size = 1)
+        self.inactivate_rotor_pub = rospy.Publisher('inactive_rotor', Int8, queue_size = 1)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -68,7 +69,7 @@ class DragonInterface:
 
         # TODO: move following implementations to inherited taks-oriented class
         self.valve_pose_ = None
-        self.valve_pose_topic_name = rospy.get_param('~valve_pose_topic')
+        self.valve_pose_topic_name = rospy.get_param('~valve_pose_topic', 'valve_pose')
         self.valve_pose_sub = rospy.Subscriber(self.valve_pose_topic_name, PoseStamped, self.valvePoseCallback)
 
         self.joy_sub = rospy.Subscriber('joy', Joy, self.joyCallback)
@@ -369,3 +370,9 @@ class DragonInterface:
         msg = Int8()
         msg.data = gimbal
         self.gimbal_wind_pub.publish(msg)
+
+    def inactivateRotor(self, rotor):
+        msg = Int8()
+        msg.data = rotor
+
+        self.inactivate_rotor_pub.publish(msg)
