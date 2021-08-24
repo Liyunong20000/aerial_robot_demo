@@ -207,7 +207,7 @@ class DragonInterface(object):
                 self.rotation_pub_.publish(rotation_msg)
 
     # TODO: extend to SE(3)
-    def goPoseWaitConvergence(self, pos, rot, pos_thresh = 0.1, rot_thresh = 0.1, timeout = 30, check_func = None):
+    def goPoseWaitConvergence(self, pos, rot, pos_thresh = 0.1, vel_thresh = 0.1, rot_thresh = 0.1, timeout = 30, check_func = None):
 
         self.targetMotion(pos, rot = rot)
         start_time = rospy.get_time()
@@ -215,7 +215,7 @@ class DragonInterface(object):
         if check_func is None:
             check_func = self.posYawConvergenceCheck
 
-        while not check_func(pos, rot, pos_thresh, rot_thresh):
+        while not check_func(pos, rot, pos_thresh, vel_thresh, rot_thresh):
             elapsed_time = rospy.get_time() - start_time
             if elapsed_time > timeout and timeout > 0:
                 return False
@@ -237,18 +237,7 @@ class DragonInterface(object):
 
         return True
 
-    def posYawConvergenceCheck(self, target_pos, target_rot, pos_thresh, rot_thresh):
-        """
-        if isinstance(pos_thresh, float):
-            pos_thresh = [pos_thresh] * 3
-        elif isinstance(pos_thresh, list):
-            if len(pos_thresh) != 3:
-                rospy.logerr_throttle(1.0, "wrong number of pos_thresh: {}, should be 3".format(pos_thresh))
-                pos_thresh = [self.default_pos_thresh] * 3
-        else:
-            rospy.logerr_throttle(1.0, "wrong type of pos thresh")
-            pos_thresh = [self.default_pos_thresh] * 3
-        """
+    def posYawConvergenceCheck(self, target_pos, target_rot, pos_thresh, vel_thresh, rot_thresh):
 
         if isinstance(pos_thresh, list):
             if len(pos_thresh) != 3:
@@ -294,7 +283,7 @@ class DragonInterface(object):
             rospy.loginfo_throttle(0.5, "\n" + text.text)
             self.nav_debug_pub_.publish(text)
 
-        if np.linalg.norm(delta_pos) < pos_thresh and abs(delta_yaw) < rot_thresh:
+        if np.linalg.norm(delta_pos) < pos_thresh and abs(delta_yaw) < rot_thresh and np.linalg.norm(current_vel) < vel_thresh:
             return True
         else:
             return False

@@ -19,7 +19,7 @@ import tf2_ros
 from jsk_rviz_plugins.msg import OverlayText
 
 
-def poseConvergenceCheck(robot, target_pos, target_rot, pos_thresh, rot_thresh):
+def poseConvergenceCheck(robot, target_pos, target_rot, pos_thresh, rot_thresh, vel_thresh):
 
     current_pos = robot.getCogPos()
     current_rot = robot.getBaselinkRot()
@@ -48,24 +48,21 @@ def poseConvergenceCheck(robot, target_pos, target_rot, pos_thresh, rot_thresh):
         rospy.loginfo_throttle(0.5, "\n" + text.text)
         robot.nav_debug_pub_.publish(text)
 
-    if np.linalg.norm(delta_pos) < pos_thresh and abs(delta_angle) < rot_thresh:
+    if np.linalg.norm(delta_pos) < pos_thresh and abs(delta_angle) < rot_thresh and np.linalg.norm(current_vel) < vel_thresh:
         return True
     else:
         return False
 
-def posYawConvergenceCheck(robot, target_pos, target_rot, pos_thresh, yaw_thresh):
+def valveApproachConvergenceCheck(robot, z_thresh, roll_pitch_thresh, target_pos, target_rot, pos_thresh, vel_thresh, yaw_thresh):
 
     current_pos = robot.getCogPos()
     current_rot = robot.getBaselinkRot()
     current_vel = robot.getCogLinearVel()
-    # TODO: consider the convergence of velocity
 
-    delta_pos = target_pos - current_pos
-    delta_yaw = euler_from_quaternion(quaternion_multiply(quaternion_inverse(target_rot), current_rot))[2]  # Note: we assume the  z axis of target baselink coincides with the z axis of valve coord
-    if delta_yaw > np.pi:
-        delta_yaw -= np.pi * 2
-    elif delta_yaw < -np.pi:
-        delta_yaw += np.pi * 2
+    # note: we assume the  z axis of target baselink coincides with the z axis of valve coord
+    delta_pos = translation_from_matrix(concatenate_matrices(quaternion_matrix(quaternion_inverse(target_rot)),
+                                                             translation_matrix(current_pos - target_pos)))
+    delta_euler = np.array(euler_from_quaternion(quaternion_multiply(quaternion_inverse(target_rot), current_rot)))
 
     if robot.debug_view_:
         text = OverlayText()
@@ -76,12 +73,12 @@ def posYawConvergenceCheck(robot, target_pos, target_rot, pos_thresh, yaw_thresh
         text.text_size = 12
         text.line_width = 2
         text.font = "DejaVu Sans Mono"
-        text.text = 'CoG Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n SetPoint\n  x: {:.4g} y: {:.4g} z: {:.4g}\n CurrentPoint\n  x: {:.4g} y: {:.4g} z: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), target_pos[0], target_pos[1], target_pos[2], current_pos[0], current_pos[1], current_pos[2])
+        text.text = 'CoG Diff\n  pos: {}, euler: {}, vel: {:.4g}\n SetPoint\n  x: {:.4g} y: {:.4g} z: {:.4g}\n CurrentPoint\n  x: {:.4g} y: {:.4g} z: {:.4g}'.format(delta_pos, delta_euler, np.linalg.norm(current_vel), target_pos[0], target_pos[1], target_pos[2], current_pos[0], current_pos[1], current_pos[2])
 
         rospy.loginfo_throttle(0.5, "\n" + text.text)
         robot.nav_debug_pub_.publish(text)
 
-    if np.linalg.norm(delta_pos) < pos_thresh and abs(delta_yaw) < yaw_thresh:
+    if np.linalg.norm(delta_pos[:2]) < pos_thresh and np.fabs(delta_pos[2]) < z_thresh and abs(delta_euler[0]) < roll_pitch_thresh and abs(delta_euler[1]) < roll_pitch_thresh and abs(delta_euler[2]) < yaw_thresh and np.linalg.norm(current_vel) < vel_thresh:
         return True
     else:
         return False
@@ -90,6 +87,40 @@ class BaseState(smach.State):
     def __init__(self, robot, outcomes=[], input_keys=[], output_keys=[], io_keys=[]):
         smach.State.__init__(self, outcomes, input_keys, output_keys, io_keys)
         self.robot = robot
+
+        robot_name = self.robot.getRobotName()
+        self.end_effector_name = robot_name + '/' + rospy.get_param('~end_effector_name', 'gripper')
+        self.baselink_name = robot_name + '/' + rospy.get_param('~baselink_name', 'baselink')
+        self.cog_name = robot_name + '/' + rospy.get_param('~cog_name', 'cog')
+
+        self.valve_type = rospy.get_param('~valve_type', '3bridges')
+        self.valve_head_offset = np.pi / int(self.valve_type[0]) / 2 # to set the end effector tips to the center of the vallve openning space.
+        if self.valve_type == '3bridges':
+            self.valve_head_offset = np.pi / 2  # special case
+
+    def calculateTargetCogPose(self, tip_offset = [0, 0, 0]):
+
+        valve_pose = self.robot.getValvePose()
+        target_end_effector_trans = concatenate_matrices(ros_np.numpify(valve_pose),  # base
+                                                             translation_matrix(tip_offset),  # origin offset
+                                                             euler_matrix(0, 0, self.valve_head_offset),  # yaw offset
+                                                             euler_matrix(0, np.pi/2, 0))  # gripper orientation regarding valve
+
+
+        cog_trans = self.robot.getTF(self.cog_name, parent_frame_id= self.end_effector_name)
+        baselink_trans = self.robot.getTF(self.baselink_name, parent_frame_id= self.end_effector_name)
+
+        target_cog_trans = concatenate_matrices(target_end_effector_trans, \
+                                                ros_np.numpify(cog_trans.transform))
+        target_baselink_trans = concatenate_matrices(target_end_effector_trans, \
+                                                     ros_np.numpify(baselink_trans.transform))
+
+
+        target_cog_pos = translation_from_matrix(target_cog_trans)
+        target_cog_rot = quaternion_from_matrix(target_baselink_trans) # use the raw baselink rotation
+
+        return target_cog_pos, target_cog_rot
+
 
 class Start(BaseState):
     def __init__(self, robot):
@@ -154,12 +185,13 @@ class Start(BaseState):
 
         return 'succeeded'
 
-class Joint(BaseState):
+class Pose(BaseState):
     def __init__(self, robot,
                  outcomes=['succeeded', 'failed'],
                  io_keys=['reverse_joint']):
         BaseState.__init__(self, robot, outcomes=outcomes, input_keys=[], output_keys=[], io_keys=io_keys)
-        self.joint_conv_thresh = rospy.get_param('~joint/conv_thresh', 0.017)
+        self.joint_conv_thresh = rospy.get_param('~pose/joint/conv_thresh', 0.017)
+        self.rot_conv_thresh = rospy.get_param('~pose/rot/conv_thresh', 0.1)
 
     def execute(self, userdata):
 
@@ -175,11 +207,26 @@ class Joint(BaseState):
             userdata.reverse_joint = False
         self.robot.setJointAngle(joint_state)
 
+        if np.abs(valve_coord_z_axis[2]) < np.cos(30):
+            # need to change the rotation first
+            _, target_rot = self.calculateTargetCogPose()
+            # workaround for the joint angle of joint1_pitch
+            # TODO: use robot model to get the precise kinematics
+            target_rot = quaternion_multiply(target_rot, quaternion_from_euler(joint_state.position[0], 0, 0))
+            self.robot.targetMotion(self.robot.getCogPos(), rot = target_rot)
+        else:
+            target_rot = self.robot.getBaselinkRot()
+
 
         while not self.robot.getForceSkipFlag():
 
             joint_angle = self.robot.getJointState().position[self.robot.getJointState().name.index('joint1_pitch')]
-            if np.fabs(joint_angle - joint_state.position[0]) < self.joint_conv_thresh:
+            diff_angle = joint_angle - joint_state.position[0]
+            curr_robot_rot = self.robot.getBaselinkRot()
+            diff_rot = quaternion_multiply(quaternion_inverse(target_rot), curr_robot_rot)
+
+            if np.fabs(diff_angle) < self.joint_conv_thresh and \
+               np.arccos(np.fabs(diff_rot[3])) * 2 < self.rot_conv_thresh:
                 break
 
             if self.robot.getTaskHaltFlag():
@@ -203,67 +250,31 @@ class Approach(BaseState):
         BaseState.__init__(self, robot, outcomes=outcomes, input_keys=input_keys, output_keys=output_keys, io_keys=io_keys)
 
         self.motion = motion
-        self.valve_type = rospy.get_param('~valve_type', '3bridges')
-        self.valve_head_offset = np.pi / int(self.valve_type[0]) / 2 # to set the end effector tips to the center of the vallve openning space.
-        if self.valve_type == '3bridges':
-            self.valve_head_offset = np.pi / 2  # special case
-
-        robot_name = self.robot.getRobotName()
-        self.end_effector_name = robot_name + '/' + rospy.get_param('~end_effector_name', 'gripper')
-        self.baselink_name = robot_name + '/' + rospy.get_param('~baselink_name', 'baselink')
-        self.cog_name = robot_name + '/' + rospy.get_param('~cog_name', 'cog')
 
         self.tip_offset = rospy.get_param('~' + motion + '/tip_offset', [0, 0, 0])
         self.pos_conv_thresh = rospy.get_param('~' + motion + '/pos_conv_thresh', 0.06)
+        self.z_conv_thresh = rospy.get_param('~' + motion + '/z_conv_thresh', 0.06)
+        self.vel_conv_thresh = rospy.get_param('~' + motion + '/vel_conv_thresh', 0.1)
         self.yaw_conv_thresh = rospy.get_param('~' + motion + '/yaw_conv_thresh', 0.1)
+        self.roll_pitch_conv_thresh = rospy.get_param('~' + motion + '/roll_pitch_conv_thresh', 0.1)
 
-        self.convergnet_func = functools.partial(posYawConvergenceCheck, self.robot) # special convergence check function
-
-    # TODO: joint angle according to valve orientation. why ?
-    def calculateTargetCogPose(self, tip_offset = [0, 0, 0]):
-
-        valve_pose = self.robot.getValvePose()
-        target_end_effector_trans = concatenate_matrices(ros_np.numpify(valve_pose),  # base
-                                                             translation_matrix(tip_offset),  # origin offset
-                                                             euler_matrix(0, 0, self.valve_head_offset),  # yaw offset
-                                                             euler_matrix(0, np.pi/2, 0))  # gripper orientation regarding valve
-
-
-        cog_trans = self.robot.getTF(self.cog_name, parent_frame_id= self.end_effector_name)
-        baselink_trans = self.robot.getTF(self.baselink_name, parent_frame_id= self.end_effector_name)
-
-        target_cog_trans = concatenate_matrices(target_end_effector_trans, \
-                                                ros_np.numpify(cog_trans.transform))
-        target_baselink_trans = concatenate_matrices(target_end_effector_trans, \
-                                                     ros_np.numpify(baselink_trans.transform))
-
-
-        target_cog_pos = translation_from_matrix(target_cog_trans)
-        target_cog_rot = quaternion_from_matrix(target_baselink_trans) # use the raw baselink rotation
-
-        return target_cog_pos, target_cog_rot
+        self.convergent_func = functools.partial(valveApproachConvergenceCheck, self.robot, self.z_conv_thresh, self.roll_pitch_conv_thresh) # special convergence check function
 
     def execute(self, userdata):
 
         target_pos, target_rot = self.calculateTargetCogPose(self.tip_offset)
-
 
         if userdata.only_yaw:
             # only extract yaw angle
             yaw = euler_from_quaternion(target_rot)[2]
             target_rot = quaternion_from_euler(0, 0, yaw)
 
-
-        if self.motion == "approach":
-            # first change the rotation if the change of rotation is large
-            roll = euler_from_quaternion(target_rot)[0]
-            pitch = euler_from_quaternion(target_rot)[1]
-            if np.abs(pitch) > np.pi/4 or np.abs(roll) > np.pi/4: # 45 deg
-                self.robot.targetMotion(self.robot.getCogPos(), rot = target_rot)
-                rospy.sleep(max(np.abs(roll), np.abs(pitch)) / (np.pi/2) * 5) # max is 5 second
-
-        conv_flag = self.robot.goPoseWaitConvergence(target_pos, target_rot, pos_thresh = self.pos_conv_thresh, \
-                                                     rot_thresh = self.yaw_conv_thresh, timeout = 30, check_func = self.convergnet_func)
+        conv_flag = self.robot.goPoseWaitConvergence(target_pos, target_rot,
+                                                     pos_thresh = self.pos_conv_thresh,
+                                                     vel_thresh = self.vel_conv_thresh,
+                                                     rot_thresh = self.yaw_conv_thresh,
+                                                     timeout = 30,
+                                                     check_func = self.convergent_func)
 
         # restore the offset of estimated wrench for further manipulation phase
         userdata.est_wrench_offset = self.robot.getEstimatedWrench()
@@ -302,7 +313,7 @@ class Contact(Approach):
 
     def execute(self, userdata):
 
-        rospy.sleep(3.0) # workaround to wait for the convergence of approach adjust.
+        rospy.sleep(2.0) # wait for the convergence of approach adjust.
 
         delta_t = 1 / self.rate
         start_t = rospy.get_time()
@@ -560,6 +571,8 @@ class Manipulate(Approach):
                     rospy.sleep(self.wind_duration) # sleep to wait the stable hovering
                     last_winding_t = rospy.get_time()
 
+                    self.stable_manipulate = False
+
 
             # 1. rotation and angular velocity
             # Note: yaw is w.r.t. the valve coord (i.e., around the z axis of valve coord)
@@ -755,7 +768,7 @@ class Finish(BaseState):
 
 
 
-            self.robot.goPoseWaitConvergence(target_pos, rot = None, pos_thresh = 0.1)
+            self.robot.goPoseWaitConvergence(target_pos, rot = None, pos_thresh = 0.1, vel_thresh = 0.1)
             rospy.sleep(2.0) # for final convergence to the end pose
 
 
@@ -771,7 +784,7 @@ class Finish(BaseState):
 
 
         rospy.loginfo_throttle(0.5, self.__class__.__name__ + '_' + self.status + ': back to home')
-        self.robot.goPoseWaitConvergence(userdata.init_cog_pos, rot = None, pos_thresh = 0.2)
+        self.robot.goPoseWaitConvergence(userdata.init_cog_pos, rot = None, pos_thresh = 0.2, vel_thresh = 0.2)
         rospy.loginfo(self.__class__.__name__ + '_' + self.status + ': landing')
         self.robot.land()
         return 'preempted'
@@ -817,7 +830,7 @@ def main():
 
         with sm_approach:
 
-            smach.StateMachine.add('Joint', Joint(robot),
+            smach.StateMachine.add('Pose', Pose(robot),
                                    transitions={'succeeded':'RoughApproach',
                                                 'failed':'failed'},
                                    remapping={'reverse_joint':'reverse_joint'})

@@ -9,19 +9,27 @@ baselink_name: fc
 cog_name: cog
 end_effector_name: gripper
 
-joint:
-  conv_thresh: 0.017 # rad
+pose:
+  joint:
+    conv_thresh: 0.017 # rad
+  rot:
+    conv_thresh: 0.5 # rad
 
 approach:
   tip_offset: [0.025, 0, 0.18] # TODO: too heusritic; 0.025 is OK for upward ground valve, 0.03 is OK for downward ceiling valve
-  pos_conv_thresh: 0.05 # m
+  pos_conv_thresh: 0.03 # m
+  z_conv_thresh: 0.05 # m
+  vel_conv_thresh: 0.08 # m/s
+  roll_pitch_conv_thresh: 0.1 # rad
   yaw_conv_thresh: 0.06  # rad
 
 adjust:
   tip_offset: [0.025, 0, 0.02] # TODO: too heuristic
   pos_conv_thresh: 0.08 # m
+  z_conv_thresh: 0.05 # m
+  vel_conv_thresh: 0.05 # m
+  roll_pitch_conv_thresh: 0.2 # rad
   yaw_conv_thresh: 0.1  # rad
-  att_conv_thresh: 0.1 # rad
 
 contact:
   rate: 10.0
