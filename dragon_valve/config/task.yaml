@@ -17,11 +17,11 @@ pose:
 
 approach:
   tip_offset: [0.025, 0, 0.18] # TODO: too heusritic; 0.025 is OK for upward ground valve, 0.03 is OK for downward ceiling valve
-  pos_conv_thresh: 0.03 # m
-  z_conv_thresh: 0.05 # m
+  pos_conv_thresh: 0.055 # m
+  z_conv_thresh: 0.06 # m
   vel_conv_thresh: 0.08 # m/s
   roll_pitch_conv_thresh: 0.1 # rad
-  yaw_conv_thresh: 0.06  # rad
+  yaw_conv_thresh: 0.07  # rad
 
 adjust:
   tip_offset: [0.025, 0, 0.02] # TODO: too heuristic
@@ -33,18 +33,18 @@ adjust:
 
 contact:
   rate: 10.0
-  angular_velocity: 0.2
+  angular_velocity: 0.1
   init_torque: 0.1 # Nm
-  incre_torque_rate: 0.2 # 0.1 is OK # Nm/s
+  incre_torque_rate: 0.1 # 0.1 is OK # Nm/s
   move_thresh: 0.1 # rad. angle change of valve
   check_interval: 4.0 # s. check the contact between robot and valve interval
 
 manipulate:
-  angular_velocity: 0.8 #0.5 # rad/s
-  round_num: 2
+  angular_velocity: 0.2 #0.5 # rad/s
+  round_num: 0.5
   rate: 20.0 # Hz, 20 Hz is better than 40Hz, since the control rate is 40Hz, check with the yaw control terms (I terms) in upward valve case
   action: open #open # workaround to designate the open/close action
-  fixed_traj: false # whether fixed the radius of the manipulating circle trajectory
+  fixed_traj: true # whether fixed the radius of the manipulating circle trajectory
   roll_moment_thresh: 0.2
   torque_adjust_roll_k: 0.01
   torque_adjust_yaw_k: 1.0

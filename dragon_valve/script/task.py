@@ -711,9 +711,10 @@ class Manipulate(Approach):
                 rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the limit of torque {}, finish manipulation".format(valve_torque))
                 break
 
-            if self.stable_manipulate and np.abs(curr_vel) < 0.3 * np.abs(turn_vel):
-                rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the stuck, the turning velocity {}, finish manipulation".format(curr_vel))
-                break
+            # TODO:please also add the divergence of roll pitch to check the close reaction
+            # if self.stable_manipulate and np.abs(curr_vel) < 0.3 * np.abs(turn_vel):
+            #     rospy.logwarn(self.__class__.__name__  + "_" + self.motion + ": reach the stuck, the turning velocity {}, finish manipulation".format(curr_vel))
+            #     break
 
 
             if not self.debug_mode:
