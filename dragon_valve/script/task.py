@@ -625,23 +625,12 @@ class Manipulate(Approach):
             if userdata.only_yaw:
                 local_cog = self.robot.getCogPos() - init_valve_pos # w.r.t word coord
 
-            if (rospy.get_time() - start_t > np.pi/2 / self.angular_velocity or sum_turn_angle > np.pi/2) and self.fixed_traj: # 5.0 second is an adhoc value
-                # method1: use pre-defined circle trajectory
-                if fixed_r < 0:
-                    fixed_r = np.linalg.norm(local_cog[:2])
-                    target_theta = np.arctan2(local_cog[1], local_cog[0])
-
+            r = np.linalg.norm(local_cog[:2])
+            if self.fixed_traj and self.stable_manipulate:
                 r = fixed_r
+            target_theta = np.arctan2(local_cog[1], local_cog[0]) + delta_yaw
 
-                target_theta += delta_yaw
-            else:
-                # method2: use current CoG position to calculate the next target CoG position
-                # assumption: the relative transform between robot and valve is constant due to the gripper
-                r = np.linalg.norm(local_cog[:2])
-                target_theta = np.arctan2(local_cog[1], local_cog[0]) + delta_yaw
-
-
-            rospy.loginfo_throttle(1.0, "radius of manipulation trajectory: {}".format(np.linalg.norm(local_cog[:2])))
+            rospy.loginfo_throttle(1.0, "radius of manipulation trajectory: {}".format(r))
 
             target_pos = np.array([r * np.cos(target_theta), r * np.sin(target_theta), target_pos_z]) # w.r.t. valve coord
             target_pos = translation_from_matrix(concatenate_matrices(init_valve_pose,
@@ -703,6 +692,7 @@ class Manipulate(Approach):
             if np.abs(curr_vel) > 0.8 * np.abs(turn_vel) and not self.stable_manipulate:
                 rospy.loginfo("the manipulation is stable")
                 self.stable_manipulate = True
+                fixed_r = np.linalg.norm(local_cog[:2])
 
 
             if np.abs(delta_vel) < self.yaw_velocity_thresh:
