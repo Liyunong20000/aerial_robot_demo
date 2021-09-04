@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+  <rosparam file="$(find dragon)/config/quad/model/FullVectoringRobotModel.yaml" command="load"/>
+  
+  <node pkg="dragon_valve" type="max_torque" name="max_torque" output="screen" >
+    <param name="init_torque" value="-10.0" />
+    <param name="increment"  value="-0.1" />
+    <param name="max_thrust"  value="30" />
+  </node>
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find dragon)/robots/quad/euclid_201709.urdf.xacro' robot_name:=dragon" />
+
+</launch>
