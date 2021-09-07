@@ -108,7 +108,7 @@
     <!-- end: gps -->
 
     ## RTK GPS
-    <xacro:if value="$(arg rtk_gps)">
+    <xacro:if value="${rtk_gps == 1}">
       <xacro:extra_module name = "rtk_gps" parent = "link2" visible = "1"
                           model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/sensor/rtk_gps_module.dae">
         <origin xyz="0.600 0.558 0.175" rpy="0 0 0"/>

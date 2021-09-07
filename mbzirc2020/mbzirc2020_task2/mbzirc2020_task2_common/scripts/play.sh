@@ -1,8 +1,20 @@
 #!/bin/bash
 
-echo ID=$1
+echo -e "\e[31m usage:
+if hydrus ID is 1, execute
+rosrun mbzirc2020_task2_common play.sh 1 hoge.bag
 
-NS=/hydrus$1
+if hydrus doesn't have ID, execute
+rosrun mbzirc2020_task2_common play.sh NONE hoge.bag \e[m"
+
+if [ $1 = "NONE" ]; then
+    echo "NO ID"
+    ID=""
+else
+    ID=$1
+fi
+
+NS=/hydrus$ID
 
 echo namespace=$NS
 
