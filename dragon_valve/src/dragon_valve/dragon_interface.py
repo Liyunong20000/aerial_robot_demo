@@ -5,15 +5,14 @@ from aerial_robot_msgs.msg import FlightNav, PoseControlPid
 import numpy as np
 import ros_numpy as ros_np
 from tf.transformations import *
-from std_msgs.msg import Empty, Int8
+from std_msgs.msg import Empty, Int8, UInt8, String
 import math
-from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from std_srvs.srv import SetBool, SetBoolRequest
 import tf2_ros
 from geometry_msgs.msg import PoseStamped, Wrench, Vector3, WrenchStamped, Quaternion, QuaternionStamped
 from sensor_msgs.msg import Joy
-from gazebo_msgs.srv import ApplyBodyWrenchRequest, BodyRequest
+from aerial_robot_msgs.msg import ApplyWrench
 
 class DragonInterface(object):
     def __init__(self, debug_view = False):
@@ -56,7 +55,8 @@ class DragonInterface(object):
         self.control_pid_sub_ = rospy.Subscriber('debug/pose/pid', PoseControlPid, self.controlPidCallback)
         self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
 
-        self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyBodyWrenchRequest, queue_size = 1)
+        self.add_wrench_pub = rospy.Publisher('apply_external_wrench', ApplyWrench, queue_size = 1)
+        self.clear_wrench_pub = rospy.Publisher('clear_external_wrench', String, queue_size=1)
         self.gimbal_wind_pub = rospy.Publisher('wind_gimbal', Int8, queue_size = 1)
         self.inactivate_rotor_pub = rospy.Publisher('inactive_rotor', Int8, queue_size = 1)
 
@@ -328,16 +328,11 @@ class DragonInterface(object):
     def addExternalWrench(self, wrench_name, reference_frame, force, torque):
 
         wrench = Wrench(force = Vector3(*force), torque = Vector3(*torque))
-        msg = ApplyBodyWrenchRequest(body_name = wrench_name, reference_frame = reference_frame, wrench = wrench)
+        msg = ApplyWrench(name = wrench_name, reference_frame = reference_frame, wrench = wrench)
         self.add_wrench_pub.publish(msg)
 
     def clearExternalWrench(self, wrench_name):
-
-        try:
-            clear_external_wrench = rospy.ServiceProxy('clear_external_wrench', BodyRequest)
-            resp = clear_external_wrench(body_name = wrench_name)
-        except rospy.ServiceException as e:
-            rospy.logerr("Service call failed: {}".format(e))
+        self.clear_wrench_pub.publish(String(wrench_name))
 
     def estimatedExternalWrenchCallback(self, msg):
         self.est_wrench = msg.wrench
