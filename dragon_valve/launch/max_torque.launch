@@ -1,13 +1,79 @@
 <?xml version="1.0"?>
 <launch>
 
+  <arg name="rotate_valve" default="false" />
+  <arg name="joint_full_search" default="false" />
+  <arg name="stopper_search" default="false" />
+  <arg name="valve_pitch_angle" default="-1.570796" />
+  <arg name="valve_rotate_angle" default="0" />
+
   <rosparam file="$(find dragon)/config/quad/model/FullVectoringRobotModel.yaml" command="load"/>
-  
-  <node pkg="dragon_valve" type="max_torque" name="max_torque" output="screen" >
-    <param name="init_torque" value="-10.0" />
-    <param name="increment"  value="-0.1" />
+
+  <param name="gimbal_lock_threshold" value="0" />
+  <param name="robot_model_refine_max_iteration" value="1" />
+  <param name="robot_model_refine_threshold" value="0.1" />
+
+  <node pkg="dragon_valve" type="max_torque" name="max_torque" output="screen">
+    <param name="init_torque" value="-15" /> <!-- no torque constraint: = max_thrust; has torque constraint: 15 -->
     <param name="max_thrust"  value="30" />
+    <param name="max_joint_torque"  value="2" /> <!-- no torque constarint: 0 -->
+        <rosparam subst_value="true">
+      root_rpy: [$(arg valve_rotate_angle), $(arg valve_pitch_angle), 0]
+    </rosparam>
+    <!-- stopper type -->
+    <rosparam param="joint_angles">[1.570796, 1.570796, 0, 1.570796, 0, 1.570796]</rosparam>
+    <!-- <rosparam param="joint_angles">[1.570796, 1.570796, 1.570796, 1.570796, 1.570796, 0]</rosparam> -->
+    <!-- <rosparam param="joint_angles">[1.56996, 1.5708, 0.689222, 1.5708, 0.404878, 1.5708]</rosparam> -->
+    <!-- <rosparam param="joint_angles">[1.33385, 1.5708, -1.54425, 1.5708, 1.00985, 1.5708]</rosparam> -->
+
+    <!-- non stopper L shape -->
+    <!-- <rosparam param="joint_angles">[1.570796, 0, 0, 0, 0, 0]</rosparam> -->
+    <!-- <rosparam param="joint_angles">[1.5708, -0.800448, 0, -0.16098, 0, -1.40569]</rosparam> -->
+
+    <!-- optimal for clutch -->
+    <!-- <rosparam param="joint_angles">[1.53333, -0.957764, 0.274359, -0.161255, 0.186048, -0.0598527]</rosparam> -->
+    <!-- <rosparam param="joint_angles">[1.56653, 0.159644, 0.273911, -0.545216, -0.0405985, -0.299286]</rosparam> -->
+
+    <!-- special type -->
+    <!-- <rosparam param="joint_angles">[0.197663,-1.06059,0.120467,-1.25219,0.273949,-0.32981]</rosparam> -->
+    <param name="joint_full_search"  value="$(arg joint_full_search)" />
+    <param name="brute_search"  value="false" />
+    <param name="stopper_search"  value="$(arg stopper_search)" />
+    <param name="rotate_valve"  value="$(arg rotate_valve)" />
+
+    <!-- all region -->
+    <!-- <rosparam param="joint_lowers">[0, -1.570796, -1.570796, -1.570796, -1.570796, -1.570796]</rosparam> -->
+    <!-- <rosparam param="joint_uppers">[1.570796, 1.570796, 1.570796,  1.570796, 1.570796, 1.570796]</rosparam> -->
+
+    <!-- all region, no stopper -->
+    <!-- <rosparam param="joint_lowers">[0, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796]</rosparam> -->
+    <!-- <rosparam param="joint_uppers">[1.560796, 1.560796, 1.560796,  1.560796, 1.560796, 1.560796]</rosparam> -->
+
+    <!-- only yaw, no stopper -->
+    <!-- <rosparam param="joint_lowers">[1.570796, -1.560796, 0, -1.560796, 0, -1.560796]</rosparam> -->
+    <!-- <rosparam param="joint_uppers">[1.570796, 1.560796, 0, 1.560796, 0, 1.560796]</rosparam> -->
+
+    <!-- stopper type -->
+    <rosparam param="joint_lowers">[0, 1.570796, -1.570796, 1.570796, -1.570796, 1.570796]</rosparam>
+    <rosparam param="joint_uppers">[1.570796, 1.570796, 1.570796, 1.570796, 1.570796, 1.570796]</rosparam>
+
+    <!-- tri all region, no stopper -->
+    <!-- <rosparam param="joint_lowers">[0, -1.560796, -1.560796, -1.560796]</rosparam> -->
+    <!-- <rosparam param="joint_uppers">[1.560796, 1.560796, 1.560796,  1.560796]</rosparam> -->
+    <!-- peta all region, no stopper -->
+    <!-- <rosparam param="joint_lowers">[0, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796]</rosparam> -->
+    <!-- <rosparam param="joint_uppers">[1.560796, 1.560796, 1.560796,  1.560796, 1.560796, 1.560796, 1.560796, 1.560796]</rosparam> -->
+    <!-- hex all region, no stopper -->
+    <!-- <rosparam param="joint_lowers">[0, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796, -1.560796]</rosparam> -->
+    <!-- <rosparam param="joint_uppers">[1.560796, 1.560796, 1.560796,  1.560796, 1.560796, 1.560796, 1.560796, 1.560796, 1.560796, 1.560796]</rosparam> -->
+
+    <param name="joint_delta"  value="0.1" />
   </node>
+
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find dragon)/robots/quad/euclid_201709.urdf.xacro' robot_name:=dragon" />
+
+  <!-- <param name="robot_description" command="$(find xacro)/xacro.py '$(find dragon_valve)/robots/tri.urdf.xacro' robot_name:=dragon" /> -->
+  <!-- <param name="robot_description" command="$(find xacro)/xacro.py '$(find dragon_valve)/robots/peta.urdf.xacro' robot_name:=dragon" /> -->
+  <!-- <param name="robot_description" command="$(find xacro)/xacro.py '$(find dragon_valve)/robots/hex.urdf.xacro' robot_name:=dragon" /> -->
 
 </launch>

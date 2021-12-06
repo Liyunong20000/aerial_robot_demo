@@ -11,8 +11,10 @@ find_package(catkin REQUIRED COMPONENTS
   dragon
 )
 
-catkin_python_setup()
+find_package(OpenMP)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
+catkin_python_setup()
 
 catkin_package(
   #  INCLUDE_DIRS include
@@ -22,9 +24,9 @@ catkin_package(
 )
 
 include_directories(
-# include
-${catkin_INCLUDE_DIRS}
-${NLOPT_INCLUDE_DIRS}
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${NLOPT_INCLUDE_DIRS}
 )
 
 add_executable(max_torque src/max_torque.cpp)

@@ -1,0 +1,550 @@
+cnt: 1000, angles: 1.37398,-0.0566205,-0.699244,torque: -11.7114; torque threshold: 2; thrust threshold: 30
+cnt: 2000, angles: 1.38003,-0.249454,-1.08847,torque: -11.6895; torque threshold: 2; thrust threshold: 30
+cnt: 3000, angles: 1.56574,1.11694,0.162281,torque: -11.9092; torque threshold: 2; thrust threshold: 30
+cnt: 4000, angles: 1.56634,-0.0406381,-0.357129,torque: -13.5352; torque threshold: 2; thrust threshold: 30
+cnt: 5000, angles: 1.53486,-0.205192,-0.721539,torque: -13.3447; torque threshold: 2; thrust threshold: 30
+cnt: 6000, angles: 1.56735,-0.0147976,-0.594116,torque: -13.5059; torque threshold: 2; thrust threshold: 30
+cnt: 7000, angles: 1.56605,0.264509,-0.677995,torque: -13.0225; torque threshold: 2; thrust threshold: 30
+cnt: 8000, angles: 1.5707,0.611668,0.392253,torque: -15.6409; torque threshold: 2; thrust threshold: 30
+cnt: 9000, angles: 1.57045,0.661088,0.372776,torque: -15.7104; torque threshold: 2; thrust threshold: 30
+[ INFO] [1638960151.664360579]: NLOPT: 41368.1[ms], max torque: 15.7397; joints: 1.56996, 1.5708, 0.689222, 1.5708, 0.404878, 1.5708, 
+[ INFO] [1638960151.664590838]: hover thrust: 21.3588 18.9542 18.4693 15.9155
+[ INFO] [1638960151.664908103]: hover joint torque: -3.80121e-08  -0.00405147     0.167893    -0.652915   0.00321284 -0.000131178    0.0132116     0.711215  -0.00724483   0.00371159    0.0231137  -0.00942263  9.43981e-05 -0.000973662
+[ INFO] [1638960151.665303015]: ex_wrench_comp_f:   11.8581   3.63455   4.54898   4.15362   15.0094  -5.39232  -15.7939  -1.93584  -7.53617 -0.217891  -16.7081   8.37952
+[ INFO] [1638960151.665347104]: final thrust: 29.5028 20.6029 21.0415 29.1958
+[ INFO] [1638960151.665418405]: joint torque: (joint1_pitch, -2.48994)(joint1_yaw, -15.4981)(joint2_pitch, 0.67821)(joint2_yaw, -6.80239)(joint3_pitch, -0.179937)(joint3_yaw, 0.633658)
+[ INFO] [1638960151.665453294]: cnt: 1, thrust diff: -0.497247, joint torque diff: -1.321790, valve torque: -15.000000
+[ INFO] [1638960151.665929093]: ex_wrench_comp_f:   17.7872   5.45183   6.82346   6.23044    22.514  -8.08849  -23.6908  -2.90376  -11.3043 -0.326836  -25.0621   12.5693
+[ INFO] [1638960151.665960671]: final thrust: 34.7622 25.7059 26.9453 37.6033
+[ INFO] [1638960151.666026637]: joint torque: (joint1_pitch, -3.81886)(joint1_yaw, -22.9208)(joint2_pitch, 1.01071)(joint2_yaw, -10.5592)(joint3_pitch, -0.281462)(joint3_yaw, 0.955199)
+[ INFO] [1638960151.666048984]: cnt: 2, thrust diff: 7.603314, joint torque diff: -0.989291, valve torque: -22.500000
+[ INFO] [1638960151.666436418]: ex_wrench_comp_f:   14.8227   4.54319   5.68622   5.19203   18.7617  -6.74041  -19.7423   -2.4198  -9.42021 -0.272364  -20.8851   10.4744
+[ INFO] [1638960151.666478675]: final thrust: 32.0703 22.9273 23.7702 33.3371
+[ INFO] [1638960151.666531240]: joint torque: (joint1_pitch, -3.1544)(joint1_yaw, -19.2094)(joint2_pitch, 0.84446)(joint2_yaw, -8.68079)(joint3_pitch, -0.230699)(joint3_yaw, 0.794429)
+[ INFO] [1638960151.666544918]: cnt: 3, thrust diff: 3.337116, joint torque diff: 0.844460, valve torque: -18.750000
+[ INFO] [1638960151.666921199]: ex_wrench_comp_f:   13.3404   4.08887    5.1176   4.67283   16.8855  -6.06636  -17.7681  -2.17782  -8.47819 -0.245127  -18.7966   9.42696
+[ INFO] [1638960151.666951660]: final thrust:  30.769 21.6985 22.3392 31.2477
+[ INFO] [1638960151.666993134]: joint torque: (joint1_pitch, -2.82217)(joint1_yaw, -17.3538)(joint2_pitch, 0.761335)(joint2_yaw, -7.74159)(joint3_pitch, -0.205318)(joint3_yaw, 0.714043)
+[ INFO] [1638960151.667025992]: cnt: 4, thrust diff: 1.247713, joint torque diff: 0.761335, valve torque: -16.875000
+[ INFO] [1638960151.667399579]: ex_wrench_comp_f:   12.5993   3.86171   4.83329   4.41323   15.9474  -5.72934   -16.781  -2.05683  -8.00718 -0.231509  -17.7523   8.90324
+[ INFO] [1638960151.667431546]: final thrust: 30.1312 21.1327 21.6721 30.2166
+[ INFO] [1638960151.667465894]: joint torque: (joint1_pitch, -2.65605)(joint1_yaw, -16.426)(joint2_pitch, 0.719773)(joint2_yaw, -7.27199)(joint3_pitch, -0.192627)(joint3_yaw, 0.673851)
+[ INFO] [1638960151.667499615]: cnt: 5, thrust diff: 0.216594, joint torque diff: 0.719773, valve torque: -15.937500
+[ INFO] [1638960151.667917343]: ex_wrench_comp_f:  12.2287  3.74813  4.69113  4.28343  15.4784 -5.56083 -16.2874 -1.99634 -7.77168  -0.2247 -17.2302  8.64138
+[ INFO] [1638960151.667950930]: final thrust: 29.8158 20.8631 21.3521 29.7048
+[ INFO] [1638960151.667998309]: joint torque: (joint1_pitch, -2.573)(joint1_yaw, -15.9621)(joint2_pitch, 0.698991)(joint2_yaw, -7.03719)(joint3_pitch, -0.186282)(joint3_yaw, 0.653755)
+[ INFO] [1638960151.668033352]: cnt: 6, thrust diff: -0.184220, joint torque diff: 0.698991, valve torque: -15.468750
+[ INFO] [1638960151.668433076]: ex_wrench_comp_f:    12.414   3.80492   4.76221   4.34833   15.7129  -5.64509  -16.5342  -2.02658  -7.88943 -0.228104  -17.4913   8.77231
+[ INFO] [1638960151.668475378]: final thrust: 29.9732 20.9968 21.5109 29.9604
+[ INFO] [1638960151.668530044]: joint torque: (joint1_pitch, -2.61452)(joint1_yaw, -16.194)(joint2_pitch, 0.709382)(joint2_yaw, -7.15459)(joint3_pitch, -0.189455)(joint3_yaw, 0.663803)
+[ INFO] [1638960151.668566184]: cnt: 7, thrust diff: -0.026800, joint torque diff: 0.709382, valve torque: -15.703125
+[ INFO] [1638960151.668978227]: ex_wrench_comp_f:   12.5066   3.83332   4.79775   4.38078   15.8302  -5.68722  -16.6576  -2.04171  -7.94831 -0.229807  -17.6218   8.83777
+[ INFO] [1638960151.669001040]: final thrust: 30.0521 21.0645 21.5912 30.0884
+[ INFO] [1638960151.669055018]: joint torque: (joint1_pitch, -2.63529)(joint1_yaw, -16.31)(joint2_pitch, 0.714577)(joint2_yaw, -7.21329)(joint3_pitch, -0.191041)(joint3_yaw, 0.668827)
+[ INFO] [1638960151.669070470]: cnt: 8, thrust diff: 0.088409, joint torque diff: 0.714577, valve torque: -15.820312
+[ INFO] [1638960151.669445493]: ex_wrench_comp_f:   12.4603   3.81912   4.77998   4.36455   15.7716  -5.66615  -16.5959  -2.03415  -7.91887 -0.228956  -17.5565   8.80504
+[ INFO] [1638960151.669484411]: final thrust: 30.0126 21.0305  21.551 30.0244
+[ INFO] [1638960151.669530952]: joint torque: (joint1_pitch, -2.62491)(joint1_yaw, -16.252)(joint2_pitch, 0.71198)(joint2_yaw, -7.18394)(joint3_pitch, -0.190248)(joint3_yaw, 0.666315)
+[ INFO] [1638960151.669559040]: cnt: 9, thrust diff: 0.024378, joint torque diff: 0.711980, valve torque: -15.761719
+[ INFO] [1638960151.669916631]: ex_wrench_comp_f:  12.4371  3.81202  4.77109  4.35644  15.7422 -5.65562  -16.565 -2.03036 -7.90415 -0.22853 -17.5239  8.78868
+[ INFO] [1638960151.669939979]: final thrust: 29.9929 21.0136  21.531 29.9924
+[ INFO] [1638960151.669977818]: joint torque: (joint1_pitch, -2.61972)(joint1_yaw, -16.223)(joint2_pitch, 0.710681)(joint2_yaw, -7.16927)(joint3_pitch, -0.189851)(joint3_yaw, 0.665059)
+[ INFO] [1638960151.669993721]: cnt: 10, thrust diff: -0.007080, joint torque diff: 0.710681, valve torque: -15.732422
+[ INFO] [1638960151.670354755]: ex_wrench_comp_f:   12.4487   3.81557   4.77554   4.36049   15.7569  -5.66089  -16.5805  -2.03226  -7.91151 -0.228743  -17.5402   8.79686
+[ INFO] [1638960151.670387123]: final thrust: 30.0028 21.0221  21.541 30.0084
+[ INFO] [1638960151.670425230]: joint torque: (joint1_pitch, -2.62231)(joint1_yaw, -16.2375)(joint2_pitch, 0.71133)(joint2_yaw, -7.1766)(joint3_pitch, -0.190049)(joint3_yaw, 0.665687)
+[ INFO] [1638960151.670450752]: cnt: 11, thrust diff: 0.008376, joint torque diff: 0.711330, valve torque: -15.747070
+[ INFO] [1638960151.670845888]: ex_wrench_comp_f:   12.4429    3.8138   4.77331   4.35847   15.7496  -5.65825  -16.5728  -2.03131  -7.90783 -0.228636  -17.5321   8.79277
+[ INFO] [1638960151.670883481]: final thrust: 29.9979 21.0179  21.536 30.0004
+[ INFO] [1638960151.670947670]: joint torque: (joint1_pitch, -2.62101)(joint1_yaw, -16.2303)(joint2_pitch, 0.711005)(joint2_yaw, -7.17294)(joint3_pitch, -0.18995)(joint3_yaw, 0.665373)
+[ INFO] [1638960151.670964736]: max turn torque at end effector is -15.739746
+
+
+
+cnt: 1000, angles: 1.05104,-0.189127,1.2777,torque: -16.0968; torque threshold: 7; thrust threshold: 30
+cnt: 2000, angles: 0.866524,0.77303,-0.554703,torque: -17.0746; torque threshold: 7; thrust threshold: 30
+cnt: 3000, angles: 1.21316,-1.19369,-0.0760357,torque: -18.6163; torque threshold: 7; thrust threshold: 30
+[ INFO] [1638959762.210175621]: NLOPT: 15720.5[ms], max torque: 19.422; joints: 1.33385, 1.5708, -1.54425, 1.5708, 1.00985, 1.5708, 
+[ INFO] [1638959762.210425836]: hover thrust: 19.0099 19.6561 18.3777 17.3994
+[ INFO] [1638959762.210804540]: hover joint torque:  -7.1211e-08  -0.00228283    -0.147689     0.336566   0.00144389 -0.000696449   -0.0230807   0.00107183   -0.0037147  0.000196049    0.0209083  -0.00515003    0.0157354 -0.000232268
+[ INFO] [1638959762.211233854]: ex_wrench_comp_f:  18.2751  7.81823  -2.3526  4.02709  8.97878 -1.00212 -9.21639 -5.02483  1.25858 -13.0858 -11.7722  2.09614
+[ INFO] [1638959762.211255626]: final thrust: 25.6612  20.944 22.1517  25.911
+[ INFO] [1638959762.211298898]: joint torque: (joint1_pitch, -4.00903)(joint1_yaw, -14.3643)(joint2_pitch, -1.23743)(joint2_yaw, 4.95257)(joint3_pitch, 0.531802)(joint3_yaw, -0.827642)
+[ INFO] [1638959762.211324083]: cnt: 1, thrust diff: -4.088975, joint torque diff: -2.047428, valve torque: -15.000000
+[ INFO] [1638959762.211711182]: ex_wrench_comp_f:  27.4127  11.7274  -3.5289  6.04064  13.4682 -1.50318 -13.8246 -7.53724  1.88787 -19.6287 -17.6583  3.14422
+[ INFO] [1638959762.211737112]: final thrust: 33.2797 23.1987 25.5149 33.0358
+[ INFO] [1638959762.211795639]: joint torque: (joint1_pitch, -5.9397)(joint1_yaw, -21.7148)(joint2_pitch, -1.8446)(joint2_yaw, 7.42832)(joint3_pitch, 0.787249)(joint3_yaw, -1.23889)
+[ INFO] [1638959762.211812010]: cnt: 2, thrust diff: 3.279711, joint torque diff: 0.428322, valve torque: -22.500000
+[ INFO] [1638959762.212246037]: ex_wrench_comp_f:  22.8439  9.77279 -2.94075  5.03386  11.2235 -1.25265 -11.5205 -6.28103  1.57322 -16.3573 -14.7152  2.62018
+[ INFO] [1638959762.212272361]: final thrust: 29.2913 21.9613 23.7459 29.3553
+[ INFO] [1638959762.212329653]: joint torque: (joint1_pitch, -4.97436)(joint1_yaw, -18.0396)(joint2_pitch, -1.54101)(joint2_yaw, 6.19045)(joint3_pitch, 0.659525)(joint3_yaw, -1.03327)
+[ INFO] [1638959762.212347070]: cnt: 3, thrust diff: -0.644689, joint torque diff: -0.809553, valve torque: -18.750000
+[ INFO] [1638959762.212733367]: ex_wrench_comp_f:  25.1283  10.7501 -3.23483  5.53725  12.3458 -1.37791 -12.6725 -6.90914  1.73054  -17.993 -16.1868   2.8822
+[ INFO] [1638959762.212761898]: final thrust:  31.249 22.5546 24.6109 31.1711
+[ INFO] [1638959762.212818414]: joint torque: (joint1_pitch, -5.45703)(joint1_yaw, -19.8772)(joint2_pitch, -1.69281)(joint2_yaw, 6.80938)(joint3_pitch, 0.723387)(joint3_yaw, -1.13608)
+[ INFO] [1638959762.212834601]: cnt: 4, thrust diff: 1.248981, joint torque diff: -0.190616, valve torque: -20.625000
+[ INFO] [1638959762.213218515]: ex_wrench_comp_f:  23.9861  10.2614 -3.08779  5.28556  11.7846 -1.31528 -12.0965 -6.59508  1.65188 -17.1752  -15.451  2.75119
+[ INFO] [1638959762.213245876]: final thrust: 30.2601 22.2514 24.1732 30.2566
+[ INFO] [1638959762.213299478]: joint torque: (joint1_pitch, -5.2157)(joint1_yaw, -18.9584)(joint2_pitch, -1.61691)(joint2_yaw, 6.49992)(joint3_pitch, 0.691456)(joint3_yaw, -1.08467)
+[ INFO] [1638959762.213316578]: cnt: 5, thrust diff: 0.260100, joint torque diff: 6.499915, valve torque: -19.687500
+[ INFO] [1638959762.213745724]: ex_wrench_comp_f:   23.415  10.0171 -3.01427  5.15971  11.5041 -1.28396 -11.8085 -6.43806  1.61255 -16.7662 -15.0831  2.68569
+[ INFO] [1638959762.213771544]: final thrust: 29.7731 22.1047 23.9583 29.8042
+[ INFO] [1638959762.213829164]: joint torque: (joint1_pitch, -5.09503)(joint1_yaw, -18.499)(joint2_pitch, -1.57896)(joint2_yaw, 6.34518)(joint3_pitch, 0.675491)(joint3_yaw, -1.05897)
+[ INFO] [1638959762.213870487]: cnt: 6, thrust diff: -0.195804, joint torque diff: 6.345181, valve torque: -19.218750
+[ INFO] [1638959762.214249721]: ex_wrench_comp_f:  23.7006  10.1393 -3.05103  5.22263  11.6444 -1.29962 -11.9525 -6.51657  1.63222 -16.9707 -15.2671  2.71844
+[ INFO] [1638959762.214278161]: final thrust: 30.0159 22.1776 24.0654   30.03
+[ INFO] [1638959762.214319936]: joint torque: (joint1_pitch, -5.15537)(joint1_yaw, -18.7287)(joint2_pitch, -1.59794)(joint2_yaw, 6.42255)(joint3_pitch, 0.683473)(joint3_yaw, -1.07182)
+[ INFO] [1638959762.214357227]: cnt: 7, thrust diff: 0.029954, joint torque diff: 6.422548, valve torque: -19.453125
+[ INFO] [1638959762.214805839]: ex_wrench_comp_f:  23.5578  10.0782 -3.03265  5.19117  11.5742 -1.29179 -11.8805 -6.47731  1.62238 -16.8685 -15.1751  2.70206
+[ INFO] [1638959762.214843543]: final thrust: 29.8943  22.141 24.0118  29.917
+[ INFO] [1638959762.214905709]: joint torque: (joint1_pitch, -5.1252)(joint1_yaw, -18.6138)(joint2_pitch, -1.58845)(joint2_yaw, 6.38386)(joint3_pitch, 0.679482)(joint3_yaw, -1.06539)
+[ INFO] [1638959762.214933291]: cnt: 8, thrust diff: -0.083033, joint torque diff: 6.383865, valve torque: -19.335938
+[ INFO] [1638959762.215310185]: ex_wrench_comp_f:  23.6292  10.1087 -3.04184   5.2069  11.6093 -1.29571 -11.9165 -6.49694   1.6273 -16.9196 -15.2211  2.71025
+[ INFO] [1638959762.215336961]: final thrust: 29.9551 22.1593 24.0386 29.9734
+[ INFO] [1638959762.215388859]: joint torque: (joint1_pitch, -5.14028)(joint1_yaw, -18.6713)(joint2_pitch, -1.59319)(joint2_yaw, 6.40321)(joint3_pitch, 0.681478)(joint3_yaw, -1.06861)
+[ INFO] [1638959762.215417105]: cnt: 9, thrust diff: -0.026566, joint torque diff: 6.403206, valve torque: -19.394531
+[ INFO] [1638959762.215837457]: ex_wrench_comp_f:  23.6649   10.124 -3.04644  5.21477  11.6268 -1.29767 -11.9345 -6.50676  1.62976 -16.9451 -15.2441  2.71434
+[ INFO] [1638959762.215864872]: final thrust: 29.9855 22.1684  24.052 30.0017
+[ INFO] [1638959762.215914865]: joint torque: (joint1_pitch, -5.14782)(joint1_yaw, -18.7)(joint2_pitch, -1.59556)(joint2_yaw, 6.41288)(joint3_pitch, 0.682476)(joint3_yaw, -1.07021)
+[ INFO] [1638959762.215933027]: cnt: 10, thrust diff: 0.001687, joint torque diff: 6.412877, valve torque: -19.423828
+[ INFO] [1638959762.216308585]: ex_wrench_comp_f:   23.647  10.1164 -3.04414  5.21084   11.618 -1.29669 -11.9255 -6.50185  1.62853 -16.9324 -15.2326   2.7123
+[ INFO] [1638959762.216339175]: final thrust: 29.9703 22.1639 24.0453 29.9876
+[ INFO] [1638959762.216397275]: joint torque: (joint1_pitch, -5.14405)(joint1_yaw, -18.6856)(joint2_pitch, -1.59438)(joint2_yaw, 6.40804)(joint3_pitch, 0.681977)(joint3_yaw, -1.06941)
+[ INFO] [1638959762.216441302]: cnt: 11, thrust diff: -0.012441, joint torque diff: 6.408042, valve torque: -19.409180
+[ INFO] [1638959762.216904020]: ex_wrench_comp_f:  23.6559  10.1202 -3.04529   5.2128  11.6224 -1.29718   -11.93  -6.5043  1.62914 -16.9387 -15.2383  2.71332
+[ INFO] [1638959762.216936408]: final thrust: 29.9779 22.1662 24.0486 29.9946
+[ INFO] [1638959762.216998134]: joint torque: (joint1_pitch, -5.14594)(joint1_yaw, -18.6928)(joint2_pitch, -1.59497)(joint2_yaw, 6.41046)(joint3_pitch, 0.682226)(joint3_yaw, -1.06981)
+[ INFO] [1638959762.217023913]: cnt: 12, thrust diff: -0.005377, joint torque diff: 6.410460, valve torque: -19.416504
+[ INFO] [1638959762.217440560]: ex_wrench_comp_f:  23.6604  10.1221 -3.04586  5.21379  11.6246 -1.29742 -11.9323 -6.50553  1.62945 -16.9419 -15.2412  2.71383
+[ INFO] [1638959762.217466237]: final thrust: 29.9817 22.1673 24.0503 29.9982
+[ INFO] [1638959762.217528843]: joint torque: (joint1_pitch, -5.14688)(joint1_yaw, -18.6964)(joint2_pitch, -1.59527)(joint2_yaw, 6.41167)(joint3_pitch, 0.682351)(joint3_yaw, -1.07001)
+[ INFO] [1638959762.217557370]: cnt: 13, thrust diff: -0.001845, joint torque diff: 6.411668, valve torque: -19.420166
+[ INFO] [1638959762.218003915]: ex_wrench_comp_f:  23.6626   10.123 -3.04615  5.21428  11.6257 -1.29754 -11.9334 -6.50614  1.62961 -16.9435 -15.2426  2.71409
+[ INFO] [1638959762.218045798]: final thrust: 29.9836 22.1679 24.0512 29.9999
+[ INFO] [1638959762.218096388]: joint torque: (joint1_pitch, -5.14735)(joint1_yaw, -18.6982)(joint2_pitch, -1.59542)(joint2_yaw, 6.41227)(joint3_pitch, 0.682413)(joint3_yaw, -1.07011)
+[ INFO] [1638959762.218118815]: max turn torque at end effector is -19.421997
+
+
+cnt: 1000, angles: 0.505394,-0.425626,-0.313337,-0.287494,0.233633,-0.89584,torque: -2.8363; torque threshold: 2; thrust threshold: 30
+cnt: 2000, angles: 1.05,-0.472204,-0.375137,-1.26411,-0.79699,-0.464514,torque: -3.92761; torque threshold: 2; thrust threshold: 30
+cnt: 3000, angles: 0.173777,-0.774145,-0.618747,-0.912762,0.749604,0.375036,torque: -3.18787; torque threshold: 2; thrust threshold: 30
+cnt: 4000, angles: 0.23412,-0.263958,-1.36862,-1.3505,-0.96719,-0.767558,torque: -2.86011; torque threshold: 2; thrust threshold: 30
+cnt: 5000, angles: 0.346114,-0.454868,-0.664986,-1.35991,-1.52967,-0.825696,torque: -7.66479; torque threshold: 2; thrust threshold: 30
+cnt: 6000, angles: 0.427807,-0.963114,-0.643905,-0.892247,-0.913581,-0.378024,torque: -4.14551; torque threshold: 2; thrust threshold: 30
+cnt: 7000, angles: 0.0503479,-1.03915,-0.494116,-1.41337,-1.47158,-0.765555,torque: -12.4585; torque threshold: 2; thrust threshold: 30
+cnt: 8000, angles: 0.0384848,-0.626692,-0.36892,-1.33898,-1.12202,-0.822862,torque: -11.4551; torque threshold: 2; thrust threshold: 30
+cnt: 9000, angles: 0.187894,-0.702765,-0.543424,-1.4631,-1.14597,-0.58939,torque: -11.2939; torque threshold: 2; thrust threshold: 30
+cnt: 10000, angles: 0.049743,-1.27963,-0.219986,-1.42603,-1.373,-0.702848,torque: -9.57275; torque threshold: 2; thrust threshold: 30
+cnt: 11000, angles: 0.027966,-0.85457,-0.296085,-1.42697,-1.38378,-0.724734,torque: -15.7397; torque threshold: 2; thrust threshold: 30
+cnt: 12000, angles: 0.0659316,-0.899025,-0.280826,-1.53073,-1.167,-0.700123,torque: -13.7549; torque threshold: 2; thrust threshold: 30
+cnt: 13000, angles: 0.0379989,-0.889285,-0.268186,-1.4827,-1.47961,-0.609993,torque: -15.9668; torque threshold: 2; thrust threshold: 30
+cnt: 14000, angles: 0.0912314,-0.808554,-0.249612,-1.45115,-1.52695,-0.625324,torque: -16.2012; torque threshold: 2; thrust threshold: 30
+cnt: 15000, angles: 0.0759867,-0.821097,-0.310135,-1.45565,-1.5185,-0.682537,torque: -17.1533; torque threshold: 2; thrust threshold: 30
+cnt: 16000, angles: 0.0273343,-0.815824,-0.216093,-1.47331,-1.54082,-0.657171,torque: -17.5195; torque threshold: 2; thrust threshold: 30
+cnt: 17000, angles: 0.0496238,-0.792789,-0.204805,-1.40725,-1.53152,-0.692862,torque: -15.7617; torque threshold: 2; thrust threshold: 30
+cnt: 18000, angles: 0.0533621,-0.80956,-0.25914,-1.45689,-1.54301,-0.653379,torque: -17.666; torque threshold: 2; thrust threshold: 30
+[ INFO] [1638960469.585520764]: NLOPT: 79171.3[ms], max torque: 18.2227; joints: 0.0456312, -0.807531, -0.223382, -1.45057, -1.55194, -0.693595, 
+[ INFO] [1638960469.585868304]: hover thrust: 19.0542 18.8006 19.0239 17.7729
+[ INFO] [1638960469.586516339]: hover joint torque: -9.33015e-09  -0.00443042    -0.582779      0.43901 -0.000782798 -0.000215164    -0.510922    -0.316672   -0.0185857 -9.40126e-05     0.511904    -0.625812   0.00747026  0.000357811
+[ INFO] [1638960469.587341021]: ex_wrench_comp_f:  -10.214  3.97657  1.11631 -16.5479  4.48475 0.828611  8.56589  3.44724  2.45861   18.196 -11.9086 -4.40354
+[ INFO] [1638960469.587383973]: final thrust: 21.6218  26.296 22.6778 25.3237
+[ INFO] [1638960469.587459268]: joint torque: (joint1_pitch, 1.54156)(joint1_yaw, -1.28277)(joint2_pitch, -1.55267)(joint2_yaw, -1.62686)(joint3_pitch, -1.55499)(joint3_yaw, 1.4987)
+[ INFO] [1638960469.587486395]: cnt: 1, thrust diff: -3.704005, joint torque diff: -0.373138, valve torque: -15.000000
+[ INFO] [1638960469.588293232]: ex_wrench_comp_f:  -15.321  5.96485  1.67447 -24.8218  6.72713  1.24292  12.8488  5.17086  3.68792   27.294 -17.8628 -6.60531
+[ INFO] [1638960469.588332926]: final thrust: 24.7135 32.8856 25.6699 34.2524
+[ INFO] [1638960469.588406826]: joint torque: (joint1_pitch, 2.60373)(joint1_yaw, -2.14365)(joint2_pitch, -2.07354)(joint2_yaw, -2.28196)(joint3_pitch, -2.58844)(joint3_yaw, 2.56096)
+[ INFO] [1638960469.588434004]: cnt: 2, thrust diff: 4.252361, joint torque diff: 0.603728, valve torque: -22.500000
+[ INFO] [1638960469.589257223]: ex_wrench_comp_f: -12.7675  4.97071  1.39539 -20.6848  5.60594  1.03576  10.7074  4.30905  3.07327   22.745 -14.8857 -5.50442
+[ INFO] [1638960469.589295195]: final thrust: 23.0552 29.4628  24.102 29.6056
+[ INFO] [1638960469.589365782]: joint torque: (joint1_pitch, 2.07264)(joint1_yaw, -1.71321)(joint2_pitch, -1.81311)(joint2_yaw, -1.95441)(joint3_pitch, -2.07172)(joint3_yaw, 2.02983)
+[ INFO] [1638960469.589391033]: cnt: 3, thrust diff: -0.394435, joint torque diff: 0.072644, valve torque: -18.750000
+[ INFO] [1638960469.590166307]: ex_wrench_comp_f: -11.4908  4.47364  1.25585 -18.6164  5.04535 0.932187  9.63663  3.87814  2.76594  20.4705 -13.3971 -4.95398
+[ INFO] [1638960469.590204578]: final thrust: 22.3075 27.8418 23.3702  27.408
+[ INFO] [1638960469.590273940]: joint torque: (joint1_pitch, 1.8071)(joint1_yaw, -1.49799)(joint2_pitch, -1.68289)(joint2_yaw, -1.79064)(joint3_pitch, -1.81335)(joint3_yaw, 1.76427)
+[ INFO] [1638960469.590299215]: cnt: 4, thrust diff: -2.158228, joint torque diff: -0.186646, valve torque: -16.875000
+[ INFO] [1638960469.591081833]: ex_wrench_comp_f: -12.1292  4.72217  1.32562 -19.6506  5.32564 0.983975   10.172   4.0936   2.9196  21.6078 -14.1414  -5.2292
+[ INFO] [1638960469.591119920]: final thrust:  22.674 28.6437 23.7314 28.4942
+[ INFO] [1638960469.591190754]: joint torque: (joint1_pitch, 1.93987)(joint1_yaw, -1.6056)(joint2_pitch, -1.748)(joint2_yaw, -1.87252)(joint3_pitch, -1.94254)(joint3_yaw, 1.89705)
+[ INFO] [1638960469.591216856]: cnt: 5, thrust diff: -1.356337, joint torque diff: -0.057465, valve torque: -17.812500
+[ INFO] [1638960469.592002058]: ex_wrench_comp_f: -12.4483  4.84644  1.36051 -20.1677  5.46579  1.00987  10.4397  4.20132  2.99643  22.1764 -14.5136 -5.36681
+[ INFO] [1638960469.592039203]: final thrust: 22.8628 29.0512 23.9156 29.0469
+[ INFO] [1638960469.592109504]: joint torque: (joint1_pitch, 2.00626)(joint1_yaw, -1.6594)(joint2_pitch, -1.78055)(joint2_yaw, -1.91347)(joint3_pitch, -2.00713)(joint3_yaw, 1.96344)
+[ INFO] [1638960469.592135392]: cnt: 6, thrust diff: -0.948835, joint torque diff: 0.007126, valve torque: -18.281250
+[ INFO] [1638960469.592915058]: ex_wrench_comp_f: -12.2887  4.78431  1.34307 -19.9092  5.39572 0.996922  10.3058  4.14746  2.95802  21.8921 -14.3275 -5.29801
+[ INFO] [1638960469.592952426]: final thrust: 22.7679 28.8469 23.8232 28.7698
+[ INFO] [1638960469.593022574]: joint torque: (joint1_pitch, 1.97307)(joint1_yaw, -1.6325)(joint2_pitch, -1.76428)(joint2_yaw, -1.89299)(joint3_pitch, -1.97483)(joint3_yaw, 1.93024)
+[ INFO] [1638960469.593047834]: cnt: 7, thrust diff: -1.153113, joint torque diff: -0.025170, valve torque: -18.046875
+[ INFO] [1638960469.593826997]: ex_wrench_comp_f: -12.3685  4.81538  1.35179 -20.0384  5.43075   1.0034  10.3728  4.17439  2.97723  22.0342 -14.4205 -5.33241
+[ INFO] [1638960469.593865497]: final thrust: 22.8153 28.9489 23.8693 28.9082
+[ INFO] [1638960469.593937369]: joint torque: (joint1_pitch, 1.98966)(joint1_yaw, -1.64595)(joint2_pitch, -1.77241)(joint2_yaw, -1.90323)(joint3_pitch, -1.99098)(joint3_yaw, 1.94684)
+[ INFO] [1638960469.593963423]: cnt: 8, thrust diff: -1.051105, joint torque diff: -0.009022, valve torque: -18.164062
+[ INFO] [1638960469.594759184]: ex_wrench_comp_f: -12.4084  4.83091  1.35615 -20.1031  5.44827  1.00663  10.4062  4.18786  2.98683  22.1053  -14.467 -5.34961
+[ INFO] [1638960469.594796576]: final thrust:  22.839      29 23.8924 28.9775
+[ INFO] [1638960469.594862903]: joint torque: (joint1_pitch, 1.99796)(joint1_yaw, -1.65268)(joint2_pitch, -1.77648)(joint2_yaw, -1.90835)(joint3_pitch, -1.99905)(joint3_yaw, 1.95514)
+[ INFO] [1638960469.594889540]: max turn torque at end effector is -18.222656
+
+cnt: 1000, angles: 0.600177,-1.3254,-0.319323,-0.110834,0.45681,0.569321,torque: -5.34668; torque threshold: 3; thrust threshold: 30
+cnt: 2000, angles: 0.219582,-1.03018,0.480229,-0.934915,-1.08614,-0.00910801,torque: -6.48193; torque threshold: 3; thrust threshold: 30
+cnt: 3000, angles: 0.52396,-0.26646,-1.25683,-1.02351,-0.347008,-0.530739,torque: -5.41992; torque threshold: 3; thrust threshold: 30
+cnt: 4000, angles: 0.432998,-0.30818,-0.599804,-0.15336,0.512081,-1.16741,torque: -3.46985; torque threshold: 3; thrust threshold: 30
+cnt: 5000, angles: 0.0393544,-0.915756,0.270944,-0.439027,-0.864878,-0.739291,torque: -4.73511; torque threshold: 3; thrust threshold: 30
+cnt: 6000, angles: 0.220555,-0.781969,-0.466113,-1.26011,-1.0769,-0.285211,torque: -10.4443; torque threshold: 3; thrust threshold: 30
+cnt: 7000, angles: 0.0778541,-0.805175,-0.352177,-0.949942,-0.807456,-0.902292,torque: -8.65723; torque threshold: 3; thrust threshold: 30
+cnt: 8000, angles: 0.0856903,-0.708625,-1.17749,-1.28087,-1.17598,-0.511281,torque: -5.53345; torque threshold: 3; thrust threshold: 30
+cnt: 9000, angles: 0.157987,-1.13285,-0.165273,-1.38196,-0.885098,-0.825295,torque: -15.5273; torque threshold: 3; thrust threshold: 30
+cnt: 10000, angles: 0.186157,-0.935748,-0.207955,-1.44713,-0.974446,-0.666658,torque: -14.6851; torque threshold: 3; thrust threshold: 30
+cnt: 11000, angles: 0.0135678,-0.887286,-0.193511,-1.39847,-0.981832,-0.829172,torque: -19.9072; torque threshold: 3; thrust threshold: 30
+cnt: 12000, angles: 0.093002,-0.854624,-0.283482,-1.37443,-1.14094,-0.854519,torque: -20.3796; torque threshold: 3; thrust threshold: 30
+cnt: 13000, angles: 0.0254504,-0.903838,-0.275892,-1.53019,-1.54171,-0.442939,torque: -20.7111; torque threshold: 3; thrust threshold: 30
+cnt: 14000, angles: 0.100505,-0.914288,-0.312465,-1.25322,-1.35088,-0.830925,torque: -16.9336; torque threshold: 3; thrust threshold: 30
+cnt: 15000, angles: 0.0506871,-0.924393,-0.25158,-1.40599,-1.33104,-0.648422,torque: -20.5518; torque threshold: 3; thrust threshold: 30
+cnt: 16000, angles: 0.0769614,-0.911029,-0.297903,-1.30761,-1.14214,-0.885732,torque: -21.1981; torque threshold: 3; thrust threshold: 30
+cnt: 17000, angles: 0.0841932,-0.920089,-0.213031,-1.37999,-1.16596,-0.777913,torque: -21.5771; torque threshold: 3; thrust threshold: 30
+cnt: 18000, angles: 0.0918467,-0.918628,-0.222352,-1.44948,-1.22283,-0.729392,torque: -20.8154; torque threshold: 3; thrust threshold: 30
+[ INFO] [1638983972.355356799]: NLOPT: 78730.1[ms], max torque: 21.7236; joints: 0.0904552, -0.918261, -0.223969, -1.39815, -1.18744, -0.731716, 
+[ INFO] [1638983972.355744967]: hover thrust: 19.1413 18.9693 18.9905 17.5822
+[ INFO] [1638983972.356426719]: hover joint torque: -1.03498e-09  -0.00458925    -0.821902      0.51854    0.0005333 -0.000205398     -0.44296    -0.475344   -0.0198379   0.00061167     0.554079     -0.51076    0.0077941  0.000488806
+[ INFO] [1638983972.357244012]: ex_wrench_comp_f: -12.6364  4.00319  1.06942 -12.1336  3.22352 0.825788  8.56792  1.96091 0.790242  16.2022 -9.18762 -2.68545
+[ INFO] [1638983972.357314996]: final thrust: 22.5953 23.5836 20.7719 23.6309
+[ INFO] [1638983972.357410016]: joint torque: (joint1_pitch, 1.81746)(joint1_yaw, -1.87442)(joint2_pitch, -2.19254)(joint2_yaw, -1.79407)(joint3_pitch, -1.89621)(joint3_yaw, 0.940716)
+[ INFO] [1638983972.357461126]: cnt: 1, thrust diff: -6.369136, joint torque diff: -0.807458, valve torque: -15.000000
+[ INFO] [1638983972.358268500]: ex_wrench_comp_f: -18.9547  6.00479  1.60413 -18.2005  4.83528  1.23868  12.8519  2.94137  1.18536  24.3033 -13.7814 -4.02818
+[ INFO] [1638983972.358340087]: final thrust: 26.7444 27.8044 22.9194 30.8004
+[ INFO] [1638983972.358435274]: joint torque: (joint1_pitch, 3.13714)(joint1_yaw, -3.0709)(joint2_pitch, -3.06733)(joint2_yaw, -2.45343)(joint3_pitch, -3.12135)(joint3_yaw, 1.66645)
+[ INFO] [1638983972.358484158]: cnt: 2, thrust diff: 0.800350, joint torque diff: 0.137135, valve torque: -22.500000
+[ INFO] [1638983972.359307849]: ex_wrench_comp_f: -15.7956  5.00399  1.33678 -15.1671   4.0294  1.03223  10.7099  2.45114 0.987803  20.2527 -11.4845 -3.35681
+[ INFO] [1638983972.359377208]: final thrust: 24.5327 25.5879 21.7605 27.0445
+[ INFO] [1638983972.359475594]: joint torque: (joint1_pitch, 2.4773)(joint1_yaw, -2.47266)(joint2_pitch, -2.62994)(joint2_yaw, -2.12375)(joint3_pitch, -2.50878)(joint3_yaw, 1.30358)
+[ INFO] [1638983972.359525832]: cnt: 3, thrust diff: -2.955477, joint torque diff: -0.370062, valve torque: -18.750000
+[ INFO] [1638983972.360399561]: ex_wrench_comp_f: -17.3751  5.50439  1.47045 -16.6838  4.43234  1.13546  11.7809  2.69625  1.08658   22.278  -12.633  -3.6925
+[ INFO] [1638983972.360474237]: final thrust: 25.6085 26.6728 22.3202 28.8877
+[ INFO] [1638983972.360569398]: joint torque: (joint1_pitch, 2.80722)(joint1_yaw, -2.77178)(joint2_pitch, -2.84864)(joint2_yaw, -2.28859)(joint3_pitch, -2.81507)(joint3_yaw, 1.48502)
+[ INFO] [1638983972.360617220]: cnt: 4, thrust diff: -1.112277, joint torque diff: -0.151364, valve torque: -20.625000
+[ INFO] [1638983972.361417017]: ex_wrench_comp_f: -18.1649  5.75459  1.53729 -17.4421  4.63381  1.18707  12.3164  2.81881  1.13597  23.2906 -13.2072 -3.86034
+[ INFO] [1638983972.361483583]: final thrust: 26.1694 27.2331 22.6151 29.8362
+[ INFO] [1638983972.361576062]: joint torque: (joint1_pitch, 2.97218)(joint1_yaw, -2.92134)(joint2_pitch, -2.95798)(joint2_yaw, -2.37101)(joint3_pitch, -2.96821)(joint3_yaw, 1.57574)
+[ INFO] [1638983972.361624989]: cnt: 5, thrust diff: -0.163819, joint torque diff: -0.027824, valve torque: -21.562500
+[ INFO] [1638983972.362468487]: ex_wrench_comp_f: -18.5598  5.87969  1.57071 -17.8213  4.73454  1.21288  12.5841  2.88009  1.16067   23.797 -13.4943 -3.94426
+[ INFO] [1638983972.362535350]: final thrust: 26.4552 27.5174 22.7661 30.3164
+[ INFO] [1638983972.362628179]: joint torque: (joint1_pitch, 3.05466)(joint1_yaw, -2.99612)(joint2_pitch, -3.01266)(joint2_yaw, -2.41222)(joint3_pitch, -3.04478)(joint3_yaw, 1.6211)
+[ INFO] [1638983972.362675742]: cnt: 6, thrust diff: 0.316395, joint torque diff: 0.054655, valve torque: -22.031250
+[ INFO] [1638983972.363552053]: ex_wrench_comp_f: -18.3623  5.81714    1.554 -17.6317  4.68418  1.19997  12.4503  2.84945  1.14832  23.5438 -13.3508  -3.9023
+[ INFO] [1638983972.363621197]: final thrust: 26.3119 27.3749 22.6903 30.0758
+[ INFO] [1638983972.363718458]: joint torque: (joint1_pitch, 3.01342)(joint1_yaw, -2.95873)(joint2_pitch, -2.98532)(joint2_yaw, -2.39161)(joint3_pitch, -3.0065)(joint3_yaw, 1.59842)
+[ INFO] [1638983972.363766114]: cnt: 7, thrust diff: 0.075809, joint torque diff: 0.013415, valve torque: -21.796875
+[ INFO] [1638983972.364585916]: ex_wrench_comp_f: -18.2636  5.78586  1.54565 -17.5369  4.65899  1.19352  12.3833  2.83413  1.14215  23.4172  -13.279 -3.88132
+[ INFO] [1638983972.364653993]: final thrust: 26.2405 27.3039 22.6526 29.9559
+[ INFO] [1638983972.364752458]: joint torque: (joint1_pitch, 2.9928)(joint1_yaw, -2.94004)(joint2_pitch, -2.97165)(joint2_yaw, -2.38131)(joint3_pitch, -2.98735)(joint3_yaw, 1.58708)
+[ INFO] [1638983972.364801124]: cnt: 8, thrust diff: -0.044126, joint torque diff: -0.007204, valve torque: -21.679688
+[ INFO] [1638983972.365594249]: ex_wrench_comp_f:  -18.313   5.8015  1.54983 -17.5843  4.67158  1.19675  12.4168  2.84179  1.14523  23.4805 -13.3149 -3.89181
+[ INFO] [1638983972.365667926]: final thrust: 26.2762 27.3394 22.6714 30.0158
+[ INFO] [1638983972.365759843]: joint torque: (joint1_pitch, 3.00311)(joint1_yaw, -2.94938)(joint2_pitch, -2.97849)(joint2_yaw, -2.38646)(joint3_pitch, -2.99692)(joint3_yaw, 1.59275)
+[ INFO] [1638983972.365815199]: cnt: 9, thrust diff: 0.015812, joint torque diff: 0.003105, valve torque: -21.738281
+[ INFO] [1638983972.366545571]: ex_wrench_comp_f: -18.2883  5.79368  1.54774 -17.5606  4.66529  1.19513  12.4001  2.83796  1.14369  23.4489 -13.2969 -3.88656
+[ INFO] [1638983972.366605299]: final thrust: 26.2584 27.3217  22.662 29.9858
+[ INFO] [1638983972.366694042]: joint torque: (joint1_pitch, 2.99795)(joint1_yaw, -2.94471)(joint2_pitch, -2.97507)(joint2_yaw, -2.38389)(joint3_pitch, -2.99214)(joint3_yaw, 1.58991)
+[ INFO] [1638983972.366756739]: cnt: 10, thrust diff: -0.014165, joint torque diff: -0.002049, valve torque: -21.708984
+[ INFO] [1638983972.367584507]: ex_wrench_comp_f: -18.3006  5.79759  1.54878 -17.5725  4.66844  1.19594  12.4084  2.83988  1.14446  23.4647 -13.3059 -3.88918
+[ INFO] [1638983972.367650907]: final thrust: 26.2673 27.3305 22.6667 30.0008
+[ INFO] [1638983972.367742041]: joint torque: (joint1_pitch, 3.00053)(joint1_yaw, -2.94705)(joint2_pitch, -2.97678)(joint2_yaw, -2.38517)(joint3_pitch, -2.99453)(joint3_yaw, 1.59133)
+[ INFO] [1638983972.367792978]: max turn torque at end effector is -21.723633
+
+
+cnt: 1000, angles: 0.132061,-0.558055,-0.38687,1.11436,0.785534,-0.0857894,torque: -5.98572; torque threshold: 5; thrust threshold: 30
+cnt: 2000, angles: 0.19739,-0.652169,1.1756,-0.581428,-0.816725,1.36608,torque: -6.40869; torque threshold: 5; thrust threshold: 30
+cnt: 3000, angles: 0.293058,-1.03665,1.28304,-0.946106,0.922506,-0.274676,torque: -7.40845; torque threshold: 5; thrust threshold: 30
+cnt: 4000, angles: 0.0994208,-0.930043,-0.578202,-1.11538,0.982682,-1.47291,torque: -16.1572; torque threshold: 5; thrust threshold: 30
+cnt: 5000, angles: 0.568312,-0.97237,-1.50983,-1.46801,-0.634596,-0.342418,torque: -9.76501; torque threshold: 5; thrust threshold: 30
+cnt: 6000, angles: 0.147535,-1.15617,-0.0484777,-1.30393,0.886996,-1.17039,torque: -20.0171; torque threshold: 5; thrust threshold: 30
+cnt: 7000, angles: 0.50931,-1.31458,-0.398574,-1.29778,-0.812515,-1.19571,torque: -11.6272; torque threshold: 5; thrust threshold: 30
+cnt: 8000, angles: 0.0995867,-1.13335,-0.0620156,-0.985933,0.0540737,-0.871404,torque: -15.4761; torque threshold: 5; thrust threshold: 30
+cnt: 9000, angles: 0.204456,-0.905646,-0.0869227,-1.09771,-0.730186,-0.821161,torque: -16.5161; torque threshold: 5; thrust threshold: 30
+cnt: 10000, angles: 0.109525,-1.02401,-0.05858,-1.19142,-1.01682,-1.19245,torque: -22.7673; torque threshold: 5; thrust threshold: 30
+cnt: 11000, angles: 0.162937,-1.03869,-0.337746,-1.21783,-0.230419,-1.16638,torque: -23.3185; torque threshold: 5; thrust threshold: 30
+cnt: 12000, angles: 0.146555,-0.917707,-0.738107,-1.36817,-1.30515,-0.331684,torque: -21.438; torque threshold: 5; thrust threshold: 30
+cnt: 13000, angles: 0.133026,-1.01029,-0.250039,-1.34807,-0.287816,-0.785119,torque: -23.855; torque threshold: 5; thrust threshold: 30
+cnt: 14000, angles: 0.14887,-1.02639,-0.178965,-1.24303,0.420808,-0.959922,torque: -23.4741; torque threshold: 5; thrust threshold: 30
+cnt: 15000, angles: 0.122511,-1.03033,-0.0487051,-1.26213,0.0375717,-0.782632,torque: -25.6567; torque threshold: 5; thrust threshold: 30
+cnt: 16000, angles: 0.0768363,-1.02201,-0.00135465,-1.30255,0.03611,-0.721866,torque: -24.8657; torque threshold: 5; thrust threshold: 30
+cnt: 17000, angles: 0.144476,-1.01327,-0.144629,-1.26672,0.16336,-0.848579,torque: -24.2871; torque threshold: 5; thrust threshold: 30
+cnt: 18000, angles: 0.126158,-1.02409,0.0466522,-1.2622,0.10736,-0.782511,torque: -26.2738; torque threshold: 5; thrust threshold: 30
+[ INFO] [1638983807.625554600]: NLOPT: 83198[ms], max torque: 26.2921; joints: 0.129985, -1.02481, 0.0550279, -1.26035, 0.128741, -0.781092, 
+[ INFO] [1638983807.625807912]: hover thrust: 18.8039 19.3607 18.8697 17.5777
+[ INFO] [1638983807.626171746]: hover joint torque: 3.08451e-08 -0.00415209   -0.650796   -0.495301 0.000317654 -0.00039073   0.0319794    -1.34386  -0.0134276  0.00159708    0.444047   -0.457421  0.00230135  0.00119414
+[ INFO] [1638983807.626576071]: ex_wrench_comp_f:   -14.5552   0.782979   0.120131   -7.14942   0.107784  0.0826836    7.67287    0.18183  -0.114183    14.0317   -1.07259 -0.0886318
+[ INFO] [1638983807.626611321]: final thrust: 22.4801 20.8246 19.6089 22.2896
+[ INFO] [1638983807.626661027]: joint torque: (joint1_pitch, 2.43092)(joint1_yaw, -2.61181)(joint2_pitch, -2.81942)(joint2_yaw, -3.32028)(joint3_pitch, -2.61592)(joint3_yaw, -1.13933)
+[ INFO] [1638983807.626679568]: cnt: 1, thrust diff: -7.519949, joint torque diff: -1.679715, valve torque: -15.000000
+[ INFO] [1638983807.627086857]: ex_wrench_comp_f:  -21.8327   1.17447  0.180197  -10.7241  0.161677  0.124025   11.5093  0.272745 -0.171275   21.0476  -1.60889 -0.132948
+[ INFO] [1638983807.627120183]: final thrust: 27.2139 22.3925 21.0456 27.1898
+[ INFO] [1638983807.627155151]: joint torque: (joint1_pitch, 3.97178)(joint1_yaw, -3.67006)(joint2_pitch, -4.24512)(joint2_yaw, -4.3085)(joint3_pitch, -4.14591)(joint3_yaw, -1.48029)
+[ INFO] [1638983807.627177390]: cnt: 2, thrust diff: -2.786096, joint torque diff: -0.691505, valve torque: -22.500000
+[ INFO] [1638983807.627568636]: ex_wrench_comp_f:  -25.4715   1.37021   0.21023  -12.5115  0.188623  0.144696   13.4275  0.318203 -0.199821   24.5555  -1.87704 -0.155106
+[ INFO] [1638983807.627606529]: final thrust: 29.9676  23.343 21.9812 29.9608
+[ INFO] [1638983807.627664984]: joint torque: (joint1_pitch, 4.74221)(joint1_yaw, -4.19918)(joint2_pitch, -4.95796)(joint2_yaw, -4.8026)(joint3_pitch, -4.9109)(joint3_yaw, -1.65076)
+[ INFO] [1638983807.627686642]: cnt: 3, thrust diff: -0.032376, joint torque diff: -0.042036, valve torque: -26.250000
+[ INFO] [1638983807.628171397]: ex_wrench_comp_f:  -27.2909   1.46809  0.225246  -13.4052  0.202096  0.155032   14.3866  0.340932 -0.214094   26.3094  -2.01111 -0.166185
+[ INFO] [1638983807.628204011]: final thrust: 31.4126 23.8543 22.4958 31.4025
+[ INFO] [1638983807.628267133]: joint torque: (joint1_pitch, 5.12743)(joint1_yaw, -4.46375)(joint2_pitch, -5.31439)(joint2_yaw, -5.04965)(joint3_pitch, -5.29339)(joint3_yaw, -1.736)
+[ INFO] [1638983807.628300553]: cnt: 4, thrust diff: 1.412568, joint torque diff: 0.314389, valve torque: -28.125000
+[ INFO] [1638983807.628770245]: ex_wrench_comp_f:  -26.3812   1.41915  0.217738  -12.9583  0.195359  0.149864   13.9071  0.329567 -0.206957   25.4325  -1.94408 -0.160645
+[ INFO] [1638983807.628808874]: final thrust: 30.6851 23.5958 22.2348 30.6775
+[ INFO] [1638983807.628860293]: joint torque: (joint1_pitch, 4.93482)(joint1_yaw, -4.33147)(joint2_pitch, -5.13618)(joint2_yaw, -4.92613)(joint3_pitch, -5.10215)(joint3_yaw, -1.69338)
+[ INFO] [1638983807.628880476]: cnt: 5, thrust diff: 0.685077, joint torque diff: 0.136177, valve torque: -27.187500
+[ INFO] [1638983807.629275926]: ex_wrench_comp_f:  -25.9264   1.39468  0.213984  -12.7349  0.191991   0.14728   13.6673  0.323885 -0.203389    24.994  -1.91056 -0.157875
+[ INFO] [1638983807.629297555]: final thrust: 30.3251 23.4687  22.107 30.3181
+[ INFO] [1638983807.629333493]: joint torque: (joint1_pitch, 4.83852)(joint1_yaw, -4.26533)(joint2_pitch, -5.04707)(joint2_yaw, -4.86436)(joint3_pitch, -5.00652)(joint3_yaw, -1.67207)
+[ INFO] [1638983807.629348400]: cnt: 6, thrust diff: 0.325051, joint torque diff: 0.047071, valve torque: -26.718750
+[ INFO] [1638983807.629711242]: ex_wrench_comp_f:  -25.6989   1.38245  0.212107  -12.6232  0.190307  0.145988   13.5474  0.321044 -0.201605   24.7747   -1.8938 -0.156491
+[ INFO] [1638983807.629741589]: final thrust:  30.146 23.4056 22.0439 30.1392
+[ INFO] [1638983807.629801839]: joint torque: (joint1_pitch, 4.79037)(joint1_yaw, -4.23225)(joint2_pitch, -5.00252)(joint2_yaw, -4.83348)(joint3_pitch, -4.95871)(joint3_yaw, -1.66142)
+[ INFO] [1638983807.629822746]: cnt: 7, thrust diff: 0.146007, joint torque diff: 0.002517, valve torque: -26.484375
+[ INFO] [1638983807.630457542]: ex_wrench_comp_f:  -25.5852   1.37633  0.211168  -12.5673  0.189465  0.145342   13.4875  0.319624 -0.200713   24.6651  -1.88542 -0.155798
+[ INFO] [1638983807.630491673]: final thrust: 30.0567 23.3743 22.0125 30.0499
+[ INFO] [1638983807.630548565]: joint torque: (joint1_pitch, 4.76629)(joint1_yaw, -4.21572)(joint2_pitch, -4.98024)(joint2_yaw, -4.81804)(joint3_pitch, -4.9348)(joint3_yaw, -1.65609)
+[ INFO] [1638983807.630569874]: cnt: 8, thrust diff: 0.056732, joint torque diff: -0.019759, valve torque: -26.367188
+[ INFO] [1638983807.631199422]: ex_wrench_comp_f:  -25.5284   1.37327  0.210699  -12.5394  0.189044  0.145019   13.4575  0.318913 -0.200267   24.6103  -1.88123 -0.155452
+[ INFO] [1638983807.631234118]: final thrust: 30.0122 23.3586 21.9968 30.0054
+[ INFO] [1638983807.631288069]: joint torque: (joint1_pitch, 4.75425)(joint1_yaw, -4.20745)(joint2_pitch, -4.9691)(joint2_yaw, -4.81032)(joint3_pitch, -4.92285)(joint3_yaw, -1.65343)
+[ INFO] [1638983807.631310058]: cnt: 9, thrust diff: 0.012157, joint torque diff: 4.969103, valve torque: -26.308594
+[ INFO] [1638983807.631936315]: ex_wrench_comp_f:  -25.4999   1.37174  0.210465  -12.5254  0.188833  0.144858   13.4425  0.318558 -0.200044   24.5829  -1.87913 -0.155279
+[ INFO] [1638983807.631968926]: final thrust: 29.9899 23.3508  21.989 29.9831
+[ INFO] [1638983807.632025385]: joint torque: (joint1_pitch, 4.74823)(joint1_yaw, -4.20332)(joint2_pitch, -4.96353)(joint2_yaw, -4.80646)(joint3_pitch, -4.91687)(joint3_yaw, -1.6521)
+[ INFO] [1638983807.632046608]: cnt: 10, thrust diff: -0.010115, joint torque diff: 4.963534, valve torque: -26.279297
+[ INFO] [1638983807.632674305]: ex_wrench_comp_f:  -25.5142   1.37251  0.210582  -12.5324  0.188939  0.144939     13.45  0.318736 -0.200155   24.5966  -1.88018 -0.155365
+[ INFO] [1638983807.632707251]: final thrust:  30.001 23.3547 21.9929 29.9942
+[ INFO] [1638983807.632763380]: joint torque: (joint1_pitch, 4.75124)(joint1_yaw, -4.20539)(joint2_pitch, -4.96632)(joint2_yaw, -4.80839)(joint3_pitch, -4.91986)(joint3_yaw, -1.65276)
+[ INFO] [1638983807.632784175]: cnt: 11, thrust diff: 0.001020, joint torque diff: 4.966318, valve torque: -26.293945
+[ INFO] [1638983807.633409919]: ex_wrench_comp_f:  -25.5071   1.37212  0.210523  -12.5289  0.188886  0.144898   13.4463  0.318647 -0.200099   24.5897  -1.87966 -0.155322
+[ INFO] [1638983807.633442674]: final thrust: 29.9955 23.3527 21.9909 29.9886
+[ INFO] [1638983807.633500172]: joint torque: (joint1_pitch, 4.74974)(joint1_yaw, -4.20435)(joint2_pitch, -4.96493)(joint2_yaw, -4.80743)(joint3_pitch, -4.91837)(joint3_yaw, -1.65243)
+[ INFO] [1638983807.633521761]: cnt: 12, thrust diff: -0.004548, joint torque diff: 4.964926, valve torque: -26.286621
+[ INFO] [1638983807.634151584]: ex_wrench_comp_f:  -25.5106   1.37232  0.210553  -12.5307  0.188912  0.144918   13.4481  0.318691 -0.200127   24.5932  -1.87992 -0.155344
+[ INFO] [1638983807.634184068]: final thrust: 29.9982 23.3537 21.9919 29.9914
+[ INFO] [1638983807.634240610]: joint torque: (joint1_pitch, 4.75049)(joint1_yaw, -4.20487)(joint2_pitch, -4.96562)(joint2_yaw, -4.80791)(joint3_pitch, -4.91911)(joint3_yaw, -1.6526)
+[ INFO] [1638983807.634260494]: cnt: 13, thrust diff: -0.001764, joint torque diff: 4.965622, valve torque: -26.290283
+[ INFO] [1638983807.634896295]: ex_wrench_comp_f:  -25.5124   1.37241  0.210567  -12.5316  0.188925  0.144929   13.4491  0.318714 -0.200141   24.5949  -1.88005 -0.155355
+[ INFO] [1638983807.634928083]: final thrust: 29.9996 23.3542 21.9924 29.9928
+[ INFO] [1638983807.634984352]: joint torque: (joint1_pitch, 4.75087)(joint1_yaw, -4.20513)(joint2_pitch, -4.96597)(joint2_yaw, -4.80815)(joint3_pitch, -4.91949)(joint3_yaw, -1.65268)
+[ INFO] [1638983807.635009214]: max turn torque at end effector is -26.292114
+
+
+cnt: 1000, angles: 0.721205,0.161042,-0.337572,0.278298,-0.356767,-1.14133,torque: -2.57835; torque threshold: 7; thrust threshold: 30
+cnt: 2000, angles: 0.193795,-0.95142,0.90771,-1.50627,0.26988,-0.25274,torque: -10.0781; torque threshold: 7; thrust threshold: 30
+cnt: 3000, angles: 0.0670428,-1.12868,0.248838,-1.19849,-0.430506,0.150504,torque: -18.5779; torque threshold: 7; thrust threshold: 30
+cnt: 4000, angles: 0.0937554,-1.34353,-0.63627,-1.22658,0.169965,1.17761,torque: -16.6443; torque threshold: 7; thrust threshold: 30
+cnt: 5000, angles: 0.0482819,-1.14515,0.323337,-1.31456,1.05316,-0.414699,torque: -23.3826; torque threshold: 7; thrust threshold: 30
+cnt: 6000, angles: 0.138632,-1.24347,-0.387075,-1.04814,-0.839363,0.235858,torque: -15.3479; torque threshold: 7; thrust threshold: 30
+cnt: 7000, angles: 0.101324,-1.01642,-0.363153,-1.28751,0.126133,0.0599132,torque: -22.1082; torque threshold: 7; thrust threshold: 30
+cnt: 8000, angles: 0.146687,-1.07695,-0.00217043,-1.53328,0.390378,0.13878,torque: -23.1482; torque threshold: 7; thrust threshold: 30
+cnt: 9000, angles: 0.158134,-1.05767,-0.472043,-1.23555,-0.5142,-0.560002,torque: -25.6934; torque threshold: 7; thrust threshold: 30
+cnt: 10000, angles: 0.0613999,-0.980113,-0.153954,-1.11922,0.00594941,-0.345496,torque: -20.2148; torque threshold: 7; thrust threshold: 30
+cnt: 11000, angles: 0.151553,-1.05277,-0.290491,-1.40677,0.226585,-0.223877,torque: -24.9719; torque threshold: 7; thrust threshold: 30
+cnt: 12000, angles: 0.0842349,-1.05589,0.0697124,-1.27714,0.0834189,-0.307608,torque: -27.2827; torque threshold: 7; thrust threshold: 30
+cnt: 13000, angles: 0.191694,-1.04821,0.0546126,-1.2862,0.0175551,-0.298469,torque: -27.3633; torque threshold: 7; thrust threshold: 30
+cnt: 14000, angles: 0.199449,-1.05426,-0.0142176,-1.26598,0.109221,-0.357568,torque: -27.4585; torque threshold: 7; thrust threshold: 30
+cnt: 15000, angles: 0.211022,-1.05083,0.0777124,-1.25402,0.0630718,-0.422765,torque: -27.464; torque threshold: 7; thrust threshold: 30
+[ INFO] [1638960918.114702990]: NLOPT: 78703.1[ms], max torque: 27.6947; joints: 0.220408, -1.06379, 0.0909619, -1.25621, 0.125335, -0.291255, 
+[ INFO] [1638960918.114918468]: hover thrust: 18.8029 19.2573 18.7791 17.7197
+[ INFO] [1638960918.115240403]: hover joint torque:  3.44207e-08  -0.00379542    -0.590453    -0.861661 -4.22733e-05 -0.000447298     0.301865     -1.66898  -0.00972559    0.0015193     0.484858    -0.798895 -0.000303616   0.00135305
+[ INFO] [1638960918.115633980]: ex_wrench_comp_f:   -13.6711   0.366341     0.1494   -6.00782   0.146602  0.0683541    6.39899   0.228495  -0.144971    13.2799  -0.741438 -0.0727831
+[ INFO] [1638960918.115680106]: final thrust: 22.1633 20.3491 19.2489  21.935
+[ INFO] [1638960918.115755145]: joint torque: (joint1_pitch, 2.30303)(joint1_yaw, -4.18081)(joint2_pitch, -3.60548)(joint2_yaw, -4.48562)(joint3_pitch, -2.89861)(joint3_yaw, -1.6011)
+[ INFO] [1638960918.115789595]: cnt: 1, thrust diff: -7.836726, joint torque diff: -2.514382, valve torque: -15.000000
+[ INFO] [1638960918.116201938]: ex_wrench_comp_f:  -20.5067  0.549511  0.224101  -9.01174  0.219903  0.102531   9.59849  0.342743 -0.217457   19.9199  -1.11216 -0.109175
+[ INFO] [1638960918.116234940]: final thrust: 26.4638 21.5128 20.2539 26.4084
+[ INFO] [1638960918.116285213]: joint torque: (joint1_pitch, 3.74977)(joint1_yaw, -5.84039)(joint2_pitch, -5.55916)(joint2_yaw, -5.89393)(joint3_pitch, -4.59035)(joint3_yaw, -2.0022)
+[ INFO] [1638960918.116306202]: cnt: 2, thrust diff: -3.536195, joint torque diff: -1.106066, valve torque: -22.500000
+[ INFO] [1638960918.116687311]: ex_wrench_comp_f: -23.9244 0.641096 0.261451 -10.5137 0.256554  0.11962  11.1982 0.399867  -0.2537  23.2399 -1.29752 -0.12737
+[ INFO] [1638960918.116717307]: final thrust: 28.9822 22.2245 20.9227 28.9604
+[ INFO] [1638960918.116772263]: joint torque: (joint1_pitch, 4.47314)(joint1_yaw, -6.67018)(joint2_pitch, -6.536)(joint2_yaw, -6.59809)(joint3_pitch, -5.43622)(joint3_yaw, -2.20275)
+[ INFO] [1638960918.116791628]: cnt: 3, thrust diff: -1.017815, joint torque diff: -0.329823, valve torque: -26.250000
+[ INFO] [1638960918.117170814]: ex_wrench_comp_f:  -25.6333  0.686889  0.280126  -11.2647  0.274879  0.128164   11.9981  0.428429 -0.271821   24.8999   -1.3902 -0.136468
+[ INFO] [1638960918.117203510]: final thrust: 30.3076 22.6094 21.2945 30.2927
+[ INFO] [1638960918.117255347]: joint torque: (joint1_pitch, 4.83482)(joint1_yaw, -7.08507)(joint2_pitch, -7.02441)(joint2_yaw, -6.95017)(joint3_pitch, -5.85915)(joint3_yaw, -2.30302)
+[ INFO] [1638960918.117275381]: cnt: 4, thrust diff: 0.307628, joint torque diff: 0.085071, valve torque: -28.125000
+[ INFO] [1638960918.117653404]: ex_wrench_comp_f:  -24.7789  0.663993  0.270788  -10.8892  0.265716  0.123892   11.5982  0.414148 -0.262761   24.0699  -1.34386 -0.131919
+[ INFO] [1638960918.117686639]: final thrust:   29.64 22.4146 21.1056 29.6224
+[ INFO] [1638960918.117738963]: joint torque: (joint1_pitch, 4.65398)(joint1_yaw, -6.87762)(joint2_pitch, -6.7802)(joint2_yaw, -6.77413)(joint3_pitch, -5.64768)(joint3_yaw, -2.25288)
+[ INFO] [1638960918.117759686]: cnt: 5, thrust diff: -0.360010, joint torque diff: -0.122376, valve torque: -27.187500
+[ INFO] [1638960918.118173243]: ex_wrench_comp_f:  -25.2061  0.675441  0.275457  -11.0769  0.270298  0.126028   11.7981  0.421288 -0.267291   24.4849  -1.36703 -0.134194
+[ INFO] [1638960918.118207840]: final thrust: 29.9726 22.5114 21.1993 29.9565
+[ INFO] [1638960918.118265148]: joint torque: (joint1_pitch, 4.7444)(joint1_yaw, -6.98135)(joint2_pitch, -6.90231)(joint2_yaw, -6.86215)(joint3_pitch, -5.75342)(joint3_yaw, -2.27795)
+[ INFO] [1638960918.118288625]: cnt: 6, thrust diff: -0.027379, joint torque diff: -0.018653, valve torque: -27.656250
+[ INFO] [1638960918.118715192]: ex_wrench_comp_f:  -25.4197  0.681165  0.277791  -11.1708  0.272588  0.127096   11.8981  0.424858 -0.269556   24.6924  -1.37861 -0.135331
+[ INFO] [1638960918.118750201]: final thrust: 30.1398 22.5603 21.2467 30.1244
+[ INFO] [1638960918.118800194]: joint torque: (joint1_pitch, 4.78961)(joint1_yaw, -7.03321)(joint2_pitch, -6.96336)(joint2_yaw, -6.90616)(joint3_pitch, -5.80628)(joint3_yaw, -2.29049)
+[ INFO] [1638960918.118824473]: cnt: 7, thrust diff: 0.139832, joint torque diff: 0.033209, valve torque: -27.890625
+[ INFO] [1638960918.119207048]: ex_wrench_comp_f:  -25.3129  0.678303  0.276624  -11.1239  0.271443  0.126562   11.8481  0.423073 -0.268424   24.5886  -1.37282 -0.134763
+[ INFO] [1638960918.119238892]: final thrust: 30.0562 22.5358  21.223 30.0404
+[ INFO] [1638960918.119289449]: joint torque: (joint1_pitch, 4.76701)(joint1_yaw, -7.00728)(joint2_pitch, -6.93284)(joint2_yaw, -6.88416)(joint3_pitch, -5.77985)(joint3_yaw, -2.28422)
+[ INFO] [1638960918.119309270]: cnt: 8, thrust diff: 0.056153, joint torque diff: 0.007278, valve torque: -27.773438
+[ INFO] [1638960918.119687120]: ex_wrench_comp_f:  -25.2595  0.676872  0.276041  -11.1004   0.27087  0.126295   11.8231  0.422181 -0.267857   24.5368  -1.36992 -0.134478
+[ INFO] [1638960918.119718645]: final thrust: 30.0144 22.5236 21.2111 29.9984
+[ INFO] [1638960918.119768780]: joint torque: (joint1_pitch, 4.7557)(joint1_yaw, -6.99431)(joint2_pitch, -6.91757)(joint2_yaw, -6.87315)(joint3_pitch, -5.76663)(joint3_yaw, -2.28109)
+[ INFO] [1638960918.119788263]: cnt: 9, thrust diff: 0.014368, joint torque diff: -0.005687, valve torque: -27.714844
+[ INFO] [1638960918.120165448]: ex_wrench_comp_f:  -25.2328  0.676156  0.275749  -11.0887  0.270584  0.126161   11.8106  0.421734 -0.267574   24.5108  -1.36847 -0.134336
+[ INFO] [1638960918.120196941]: final thrust: 29.9935 22.5175 21.2052 29.9775
+[ INFO] [1638960918.120247754]: joint torque: (joint1_pitch, 4.75005)(joint1_yaw, -6.98783)(joint2_pitch, -6.90994)(joint2_yaw, -6.86765)(joint3_pitch, -5.76003)(joint3_yaw, -2.27952)
+[ INFO] [1638960918.120267440]: cnt: 10, thrust diff: -0.006510, joint torque diff: 6.987830, valve torque: -27.685547
+[ INFO] [1638960918.120916371]: ex_wrench_comp_f:  -25.2462  0.676514  0.275895  -11.0945  0.270727  0.126228   11.8169  0.421957 -0.267716   24.5238   -1.3692 -0.134407
+[ INFO] [1638960918.120973972]: final thrust: 30.0039 22.5206 21.2082 29.9879
+[ INFO] [1638960918.121039213]: joint torque: (joint1_pitch, 4.75288)(joint1_yaw, -6.99107)(joint2_pitch, -6.91376)(joint2_yaw, -6.8704)(joint3_pitch, -5.76333)(joint3_yaw, -2.2803)
+[ INFO] [1638960918.121067204]: cnt: 11, thrust diff: 0.003928, joint torque diff: 6.991071, valve torque: -27.700195
+[ INFO] [1638960918.121727892]: ex_wrench_comp_f:  -25.2395  0.676335  0.275822  -11.0916  0.270656  0.126195   11.8138  0.421846 -0.267645   24.5173  -1.36884 -0.134372
+[ INFO] [1638960918.121764104]: final thrust: 29.9987 22.5191 21.2067 29.9827
+[ INFO] [1638960918.121818734]: joint torque: (joint1_pitch, 4.75146)(joint1_yaw, -6.98945)(joint2_pitch, -6.91185)(joint2_yaw, -6.86903)(joint3_pitch, -5.76168)(joint3_yaw, -2.27991)
+[ INFO] [1638960918.121842928]: cnt: 12, thrust diff: -0.001291, joint torque diff: 6.989451, valve torque: -27.692871
+[ INFO] [1638960918.122444117]: ex_wrench_comp_f:  -25.2428  0.676425  0.275858  -11.0931  0.270691  0.126211   11.8153  0.421902  -0.26768   24.5205  -1.36902 -0.134389
+[ INFO] [1638960918.122478874]: final thrust: 30.0013 22.5198 21.2074 29.9853
+[ INFO] [1638960918.122522808]: joint torque: (joint1_pitch, 4.75217)(joint1_yaw, -6.99026)(joint2_pitch, -6.9128)(joint2_yaw, -6.86972)(joint3_pitch, -5.7625)(joint3_yaw, -2.28011)
+[ INFO] [1638960918.122546293]: cnt: 13, thrust diff: 0.001318, joint torque diff: 6.990261, valve torque: -27.696533
+[ INFO] [1638960918.123119478]: ex_wrench_comp_f:  -25.2411   0.67638   0.27584  -11.0923  0.270674  0.126203   11.8146  0.421874 -0.267663   24.5189  -1.36893  -0.13438
+[ INFO] [1638960918.123162656]: final thrust:      30 22.5194 21.2071  29.984
+[ INFO] [1638960918.123216813]: joint torque: (joint1_pitch, 4.75182)(joint1_yaw, -6.98986)(joint2_pitch, -6.91233)(joint2_yaw, -6.86937)(joint3_pitch, -5.76209)(joint3_yaw, -2.28001)
+[ INFO] [1638960918.123239423]: max turn torque at end effector is -27.694702
+
+
+cnt: 1000, angles: 0.918792,0.20156,-0.191697,-1.12969,-1.55354,-0.749412,torque: -6.92596; torque threshold: 0; thrust threshold: 30
+cnt: 2000, angles: 0.862955,-1.36591,1.35022,-0.675249,-0.803323,0.322468,torque: -15.509; torque threshold: 0; thrust threshold: 30
+cnt: 3000, angles: 0.859627,-1.07188,0.674263,-0.582541,-0.607683,-0.169303,torque: -27.0483; torque threshold: 0; thrust threshold: 30
+cnt: 4000, angles: 1.39107,-0.97997,0.985451,-0.775529,-0.80436,-0.759001,torque: -25.8124; torque threshold: 0; thrust threshold: 30
+cnt: 5000, angles: 0.295205,-1.44229,-0.613606,-1.0552,0.701478,0.942678,torque: -27.3303; torque threshold: 0; thrust threshold: 30
+cnt: 6000, angles: 1.24564,-1.49521,0.0207655,-0.820039,-0.546057,-1.52447,torque: -28.4235; torque threshold: 0; thrust threshold: 30
+cnt: 7000, angles: 1.31054,-0.747307,0.489492,-0.948026,0.34936,-0.0588166,torque: -29.5898; torque threshold: 0; thrust threshold: 30
+cnt: 8000, angles: 1.5179,-0.432013,0.26309,-0.380742,0.137842,-0.709234,torque: -30.3864; torque threshold: 0; thrust threshold: 30
+cnt: 9000, angles: 1.51271,-0.320181,0.310314,0.107571,0.519186,-0.658475,torque: -29.317; torque threshold: 0; thrust threshold: 30
+cnt: 10000, angles: 1.35038,-1.02588,0.45637,-0.804391,-0.217602,-1.13504,torque: -28.7219; torque threshold: 0; thrust threshold: 30
+cnt: 11000, angles: 1.50521,-0.809413,0.252692,0.102762,0.297853,-0.612856,torque: -30.7581; torque threshold: 0; thrust threshold: 30
+cnt: 12000, angles: 1.52569,-1.09028,0.223104,-0.44108,0.0095463,-0.05887,torque: -30.2637; torque threshold: 0; thrust threshold: 30
+cnt: 13000, angles: 1.52521,-0.949787,0.259057,-0.232114,0.286177,0.214498,torque: -31.9775; torque threshold: 0; thrust threshold: 30
+cnt: 14000, angles: 1.51456,-0.874358,0.283883,-0.0558454,0.220787,-0.247106,torque: -32.3767; torque threshold: 0; thrust threshold: 30
+cnt: 15000, angles: 1.52769,-0.849665,0.250002,-0.0592124,0.282379,-0.210857,torque: -32.3566; torque threshold: 0; thrust threshold: 30
+cnt: 16000, angles: 1.51913,-0.862582,0.289576,-0.00662791,0.203904,-0.274253,torque: -32.4097; torque threshold: 0; thrust threshold: 30
+cnt: 17000, angles: 1.55512,-0.780132,0.274528,-0.135893,0.143468,-0.0267036,torque: -32.439; torque threshold: 0; thrust threshold: 30
+cnt: 18000, angles: 1.51679,-0.872008,0.284074,-0.0280054,0.21072,-0.199697,torque: -32.3438; torque threshold: 0; thrust threshold: 30
+[ INFO] [1638966843.176887485]: NLOPT: 90081.4[ms], max torque: 32.655; joints: 1.53333, -0.957764, 0.274359, -0.161255, 0.186048, -0.0598527, 
+[ INFO] [1638966843.177126789]: hover thrust: 18.7013 18.4974 18.5386 18.6394
+[ INFO] [1638966843.177454066]: hover joint torque:  5.54431e-08  -0.00161858      0.67257      1.02862   0.00618668  6.53726e-05      2.14658     0.639288 -0.000120857  0.000301824      1.19277     0.211083  -0.00436549  0.000497258
+[ INFO] [1638966843.177856417]: ex_wrench_comp_f:  -18.8307  -11.4301   0.48882  -7.59417  -3.81352 -0.111475   6.75204   4.84088 -0.463085   19.6729   10.4028 0.0857402
+[ INFO] [1638966843.177898530]: final thrust: 28.4983 20.1564 19.7294 28.4819
+[ INFO] [1638966843.177932654]: joint torque: (joint1_pitch, 4.65338)(joint1_yaw, -27.9925)(joint2_pitch, 2.08948)(joint2_yaw, -16.4166)(joint3_pitch, 1.21929)(joint3_yaw, -4.4805)
+[ INFO] [1638966843.177971217]: cnt: 1, thrust diff: -1.501691, joint torque diff: 27.992460, valve torque: -30.000000
+[ INFO] [1638966843.178343901]: ex_wrench_comp_f:  -28.2461  -17.1452  0.733231  -11.3912  -5.72027 -0.167213   10.1281   7.26132 -0.694628   29.5093   15.6041   0.12861
+[ INFO] [1638966843.178382202]: final thrust: 37.5163 22.1926 21.5398 37.6105
+[ INFO] [1638966843.178430401]: joint torque: (joint1_pitch, 6.64378)(joint1_yaw, -42.503)(joint2_pitch, 2.06093)(joint2_yaw, -24.9445)(joint3_pitch, 1.23255)(joint3_yaw, -6.82629)
+[ INFO] [1638966843.178448695]: cnt: 2, thrust diff: 7.610514, joint torque diff: 42.503001, valve torque: -45.000000
+[ INFO] [1638966843.178840027]: ex_wrench_comp_f:  -23.5384  -14.2877  0.611026  -9.49271  -4.76689 -0.139344   8.44005    6.0511 -0.578856   24.5911   13.0035  0.107175
+[ INFO] [1638966843.178877128]: final thrust: 32.8553 21.0922 20.5494 32.8927
+[ INFO] [1638966843.178922077]: joint torque: (joint1_pitch, 5.64858)(joint1_yaw, -35.2477)(joint2_pitch, 2.0752)(joint2_yaw, -20.6806)(joint3_pitch, 1.22592)(joint3_yaw, -5.65339)
+[ INFO] [1638966843.178946555]: cnt: 3, thrust diff: 2.892739, joint torque diff: 35.247730, valve torque: -37.500000
+[ INFO] [1638966843.179356533]: ex_wrench_comp_f:  -21.1846  -12.8589  0.549923  -8.54344   -4.2902  -0.12541   7.59605   5.44599 -0.520971    22.132   11.7031 0.0964577
+[ INFO] [1638966843.179387153]: final thrust: 30.6305 20.6022 20.1167 30.6405
+[ INFO] [1638966843.179424888]: joint torque: (joint1_pitch, 5.15098)(joint1_yaw, -31.6201)(joint2_pitch, 2.08234)(joint2_yaw, -18.5486)(joint3_pitch, 1.22261)(joint3_yaw, -5.06695)
+[ INFO] [1638966843.179447791]: cnt: 4, thrust diff: 0.640459, joint torque diff: 31.620095, valve torque: -33.750000
+[ INFO] [1638966843.179840494]: ex_wrench_comp_f:  -20.0077  -12.1445  0.519372   -8.0688  -4.05186 -0.118443   7.17404   5.14344 -0.492028   20.9024   11.0529 0.0910989
+[ INFO] [1638966843.179872243]: final thrust: 29.5515 20.3736 19.9172 29.5482
+[ INFO] [1638966843.179904828]: joint torque: (joint1_pitch, 4.90218)(joint1_yaw, -29.8063)(joint2_pitch, 2.08591)(joint2_yaw, -17.4826)(joint3_pitch, 1.22095)(joint3_yaw, -4.77372)
+[ INFO] [1638966843.179924339]: cnt: 5, thrust diff: -0.448456, joint torque diff: 29.806278, valve torque: -31.875000
+[ INFO] [1638966843.180309696]: ex_wrench_comp_f:  -20.5961  -12.5017  0.534647  -8.30612  -4.17103 -0.121926   7.38505   5.29471 -0.506499   21.5172    11.378 0.0937783
+[ INFO] [1638966843.180341550]: final thrust:  30.088 20.4865 20.0155 30.0912
+[ INFO] [1638966843.180375940]: joint torque: (joint1_pitch, 5.02658)(joint1_yaw, -30.7132)(joint2_pitch, 2.08413)(joint2_yaw, -18.0156)(joint3_pitch, 1.22178)(joint3_yaw, -4.92033)
+[ INFO] [1638966843.180406153]: cnt: 6, thrust diff: 0.091233, joint torque diff: 30.713186, valve torque: -32.812500
+[ INFO] [1638966843.180802665]: ex_wrench_comp_f:  -20.3019  -12.3231   0.52701  -8.18746  -4.11145 -0.120185   7.27954   5.21907 -0.499264   21.2098   11.2155 0.0924386
+[ INFO] [1638966843.180834625]: final thrust:  29.819 20.4297  19.966 29.8189
+[ INFO] [1638966843.180877367]: joint torque: (joint1_pitch, 4.96438)(joint1_yaw, -30.2597)(joint2_pitch, 2.08502)(joint2_yaw, -17.7491)(joint3_pitch, 1.22136)(joint3_yaw, -4.84703)
+[ INFO] [1638966843.180917071]: cnt: 7, thrust diff: -0.181023, joint torque diff: 30.259732, valve torque: -32.343750
+[ INFO] [1638966843.181312789]: ex_wrench_comp_f:   -20.449  -12.4124  0.530828  -8.24679  -4.14124 -0.121055    7.3323   5.25689 -0.502882   21.3635   11.2968 0.0931085
+[ INFO] [1638966843.181344835]: final thrust: 29.9533  20.458 19.9907 29.9549
+[ INFO] [1638966843.181387136]: joint torque: (joint1_pitch, 4.99548)(joint1_yaw, -30.4865)(joint2_pitch, 2.08457)(joint2_yaw, -17.8823)(joint3_pitch, 1.22157)(joint3_yaw, -4.88368)
+[ INFO] [1638966843.181417755]: cnt: 8, thrust diff: -0.045125, joint torque diff: 30.486459, valve torque: -32.578125
+[ INFO] [1638966843.181810981]: ex_wrench_comp_f:  -20.5226  -12.4571  0.532738  -8.27645  -4.15614 -0.121491   7.35867    5.2758  -0.50469   21.4404   11.3374 0.0934434
+[ INFO] [1638966843.181842834]: final thrust: 30.0206 20.4722 20.0031  30.023
+[ INFO] [1638966843.181877163]: joint torque: (joint1_pitch, 5.01103)(joint1_yaw, -30.5998)(joint2_pitch, 2.08435)(joint2_yaw, -17.9489)(joint3_pitch, 1.22168)(joint3_yaw, -4.90201)
+[ INFO] [1638966843.181907614]: cnt: 9, thrust diff: 0.023006, joint torque diff: 30.599823, valve torque: -32.695312
+[ INFO] [1638966843.182300785]: ex_wrench_comp_f:  -20.4858  -12.4347  0.531783  -8.26162  -4.14869 -0.121273   7.34548   5.26635 -0.503786   21.4019   11.3171 0.0932759
+[ INFO] [1638966843.182332708]: final thrust: 29.9869 20.4651 19.9969 29.9889
+[ INFO] [1638966843.182366620]: joint torque: (joint1_pitch, 5.00325)(joint1_yaw, -30.5431)(joint2_pitch, 2.08446)(joint2_yaw, -17.9156)(joint3_pitch, 1.22162)(joint3_yaw, -4.89285)
+[ INFO] [1638966843.182396513]: cnt: 10, thrust diff: -0.011072, joint torque diff: 30.543141, valve torque: -32.636719
+[ INFO] [1638966843.182817042]: ex_wrench_comp_f:  -20.5042  -12.4459  0.532261  -8.26904  -4.15241 -0.121382   7.35208   5.27108 -0.504238   21.4211   11.3272 0.0933596
+[ INFO] [1638966843.182849332]: final thrust: 30.0037 20.4687      20  30.006
+[ INFO] [1638966843.182902303]: joint torque: (joint1_pitch, 5.00714)(joint1_yaw, -30.5715)(joint2_pitch, 2.08441)(joint2_yaw, -17.9323)(joint3_pitch, 1.22165)(joint3_yaw, -4.89743)
+[ INFO] [1638966843.182932408]: cnt: 11, thrust diff: 0.005964, joint torque diff: 30.571482, valve torque: -32.666016
+[ INFO] [1638966843.183326732]: ex_wrench_comp_f:   -20.495  -12.4403  0.532022  -8.26533  -4.15055 -0.121328   7.34878   5.26871 -0.504012   21.4115   11.3222 0.0933178
+[ INFO] [1638966843.183361351]: final thrust: 29.9953 20.4669 19.9984 29.9974
+[ INFO] [1638966843.183415301]: joint torque: (joint1_pitch, 5.0052)(joint1_yaw, -30.5573)(joint2_pitch, 2.08443)(joint2_yaw, -17.924)(joint3_pitch, 1.22164)(joint3_yaw, -4.89514)
+[ INFO] [1638966843.183446416]: cnt: 12, thrust diff: -0.002555, joint torque diff: 30.557311, valve torque: -32.651367
+[ INFO] [1638966843.183877734]: ex_wrench_comp_f:  -20.4996  -12.4431  0.532141  -8.26718  -4.15148 -0.121355   7.35043   5.26989 -0.504125   21.4163   11.3247 0.0933387
+[ INFO] [1638966843.183909129]: final thrust: 29.9995 20.4678 19.9992 30.0017
+[ INFO] [1638966843.183961498]: joint torque: (joint1_pitch, 5.00617)(joint1_yaw, -30.5644)(joint2_pitch, 2.08442)(joint2_yaw, -17.9281)(joint3_pitch, 1.22164)(joint3_yaw, -4.89628)
+[ INFO] [1638966843.183991142]: cnt: 13, thrust diff: 0.001705, joint torque diff: 30.564397, valve torque: -32.658691
+[ INFO] [1638966843.184364823]: ex_wrench_comp_f:  -20.4973  -12.4417  0.532082  -8.26626  -4.15102 -0.121341    7.3496    5.2693 -0.504069   21.4139   11.3234 0.0933282
+[ INFO] [1638966843.184395669]: final thrust: 29.9974 20.4673 19.9988 29.9996
+[ INFO] [1638966843.184448490]: joint torque: (joint1_pitch, 5.00568)(joint1_yaw, -30.5609)(joint2_pitch, 2.08443)(joint2_yaw, -17.926)(joint3_pitch, 1.22164)(joint3_yaw, -4.89571)
+[ INFO] [1638966843.184478066]: max turn torque at end effector is -32.655029
+
+
+cnt: 1000, angles: -0.648138,1.26916,0.684813,torque: -6.84265; torque threshold: 7; thrust threshold: 30
+cnt: 2000, angles: -0.975657,-0.0742036,-1.3844,torque: -8.94653; torque threshold: 7; thrust threshold: 30
+cnt: 3000, angles: -0.798296,-0.230227,-1.10144,torque: -8.974; torque threshold: 7; thrust threshold: 30
+cnt: 4000, angles: -0.717945,-0.278561,-1.2205,torque: -8.97583; torque threshold: 7; thrust threshold: 30
+cnt: 5000, angles: -0.799277,-0.185083,-1.40987,torque: -8.98315; torque threshold: 7; thrust threshold: 30
+cnt: 6000, angles: -0.822416,-0.195351,-1.35885,torque: -8.98132; torque threshold: 7; thrust threshold: 30
+cnt: 7000, angles: -0.810257,-0.163502,-1.34385,torque: -8.98132; torque threshold: 7; thrust threshold: 30
+cnt: 8000, angles: -0.800774,-0.183532,-1.3784,torque: -8.98315; torque threshold: 7; thrust threshold: 30
+cnt: 9000, angles: -0.816975,-0.163054,-1.39366,torque: -8.98315; torque threshold: 7; thrust threshold: 30
+[ INFO] [1638975399.190773996]: NLOPT: 49304[ms], max torque: 8.98315; joints: 1.5708, -0.800448, 0, -0.16098, 0, -1.40569, 
+[ INFO] [1638975399.190973494]: hover thrust: 19.1619 18.6521 18.5826 18.0973
+[ INFO] [1638975399.191297296]: hover joint torque: 4.78362e-08 -0.00257227   -0.430607     1.87262   0.0111832 4.27644e-05    0.599995    0.910342 -0.00415276 0.000152633    0.165249  0.00826212  0.00337484  0.00262846
+[ INFO] [1638975399.191700347]: ex_wrench_comp_f: -3.61871 -3.78739 -2.77553 -11.7742 -5.92928  1.37512  1.22381  4.85033  6.74796  14.1691  4.86634 -5.34755
+[ INFO] [1638975399.191732065]: final thrust: 16.7134 23.5912 25.6906 18.5677
+[ INFO] [1638975399.191780351]: joint torque: (joint1_pitch, 0.4119)(joint1_yaw, -12.9442)(joint2_pitch, -0.57028)(joint2_yaw, -8.09722)(joint3_pitch, -0.448457)(joint3_yaw, -1.35392)
+[ INFO] [1638975399.191814952]: cnt: 1, thrust diff: -4.309406, joint torque diff: 5.944151, valve torque: -15.000000
+[ INFO] [1638975399.192201599]: ex_wrench_comp_f: -1.80935  -1.8937 -1.38776  -5.8871 -2.96464 0.687558 0.611904  2.42517  3.37398  7.08455  2.43317 -2.67378
+[ INFO] [1638975399.192232161]: final thrust: 17.7334 20.2065 22.0232 16.5189
+[ INFO] [1638975399.192298403]: joint torque: (joint1_pitch, -0.00935324)(joint1_yaw, -5.53576)(joint2_pitch, 0.0148576)(joint2_yaw, -3.59344)(joint3_pitch, -0.141604)(joint3_yaw, -0.67283)
+[ INFO] [1638975399.192313157]: cnt: 2, thrust diff: -7.976842, joint torque diff: -1.464236, valve torque: -7.500000
+[ INFO] [1638975399.192665474]: ex_wrench_comp_f: -2.71403 -2.84055 -2.08165 -8.83065 -4.44696  1.03134 0.917856  3.63775  5.06097  10.6268  3.64975 -4.01066
+[ INFO] [1638975399.192706433]: final thrust: 17.1671 21.7128 23.8349 17.1173
+[ INFO] [1638975399.192749284]: joint torque: (joint1_pitch, 0.201274)(joint1_yaw, -9.23996)(joint2_pitch, -0.277711)(joint2_yaw, -5.84533)(joint3_pitch, -0.29503)(joint3_yaw, -1.01338)
+[ INFO] [1638975399.192772252]: cnt: 3, thrust diff: -6.165086, joint torque diff: 2.239958, valve torque: -11.250000
+[ INFO] [1638975399.193121135]: ex_wrench_comp_f: -2.26169 -2.36712  -1.7347 -7.35888  -3.7058 0.859447  0.76488  3.03146  4.21748  8.85569  3.04146 -3.34222
+[ INFO] [1638975399.193152401]: final thrust: 17.4368 20.9076 22.9229 16.7029
+[ INFO] [1638975399.193201135]: joint torque: (joint1_pitch, 0.0959601)(joint1_yaw, -7.38786)(joint2_pitch, -0.131427)(joint2_yaw, -4.71939)(joint3_pitch, -0.218317)(joint3_yaw, -0.843103)
+[ INFO] [1638975399.193217230]: cnt: 4, thrust diff: -7.077111, joint torque diff: 0.387861, valve torque: -9.375000
+[ INFO] [1638975399.193573555]: ex_wrench_comp_f: -2.03552 -2.13041 -1.56123 -6.62299 -3.33522 0.773502 0.688392  2.72831  3.79573  7.97012  2.73731   -3.008
+[ INFO] [1638975399.193603819]: final thrust: 17.5818 20.5434 22.4714 16.5814
+[ INFO] [1638975399.193637857]: joint torque: (joint1_pitch, 0.0433034)(joint1_yaw, -6.46181)(joint2_pitch, -0.0582846)(joint2_yaw, -4.15641)(joint3_pitch, -0.179961)(joint3_yaw, -0.757966)
+[ INFO] [1638975399.193650360]: cnt: 5, thrust diff: -7.528606, joint torque diff: -0.538187, valve torque: -8.437500
+[ INFO] [1638975399.194085720]: ex_wrench_comp_f: -2.14861 -2.24877 -1.64797 -6.99093 -3.52051 0.816475 0.726636  2.87989   4.0066   8.4129  2.88939 -3.17511
+[ INFO] [1638975399.194114188]: final thrust: 17.5084 20.7222 22.6967 16.6348
+[ INFO] [1638975399.194181960]: joint torque: (joint1_pitch, 0.0696318)(joint1_yaw, -6.92484)(joint2_pitch, -0.0948557)(joint2_yaw, -4.4379)(joint3_pitch, -0.199139)(joint3_yaw, -0.800535)
+[ INFO] [1638975399.194205933]: cnt: 6, thrust diff: -7.303254, joint torque diff: -0.075163, valve torque: -8.906250
+[ INFO] [1638975399.194593248]: ex_wrench_comp_f: -2.20515 -2.30794 -1.69134  -7.1749 -3.61315 0.837961 0.745758  2.95567  4.11204   8.6343  2.96542 -3.25866
+[ INFO] [1638975399.194623134]: final thrust: 17.4724 20.8141 22.8097  16.667
+[ INFO] [1638975399.194678166]: joint torque: (joint1_pitch, 0.082796)(joint1_yaw, -7.15635)(joint2_pitch, -0.113141)(joint2_yaw, -4.57864)(joint3_pitch, -0.208728)(joint3_yaw, -0.821819)
+[ INFO] [1638975399.194700646]: cnt: 7, thrust diff: -7.190280, joint torque diff: 0.156349, valve torque: -9.140625
+[ INFO] [1638975399.195090967]: ex_wrench_comp_f: -2.17688 -2.27835 -1.66965 -7.08292 -3.56683 0.827218 0.736197  2.91778  4.05932   8.5236  2.92741 -3.21689
+[ INFO] [1638975399.195119951]: final thrust: 17.4904 20.7679 22.7532 16.6504
+[ INFO] [1638975399.195162729]: joint torque: (joint1_pitch, 0.0762139)(joint1_yaw, -7.04059)(joint2_pitch, -0.103998)(joint2_yaw, -4.50827)(joint3_pitch, -0.203933)(joint3_yaw, -0.811177)
+[ INFO] [1638975399.195181340]: cnt: 8, thrust diff: -7.246791, joint torque diff: 0.040593, valve torque: -9.023438
+[ INFO] [1638975399.195689173]: ex_wrench_comp_f: -2.16274 -2.26356 -1.65881 -7.03693 -3.54367 0.821846 0.731417  2.89883  4.03296  8.46825   2.9084   -3.196
+[ INFO] [1638975399.195725305]: final thrust: 17.4994  20.745  22.725 16.6425
+[ INFO] [1638975399.195782850]: joint torque: (joint1_pitch, 0.0729228)(joint1_yaw, -6.98271)(joint2_pitch, -0.0994271)(joint2_yaw, -4.47308)(joint3_pitch, -0.201536)(joint3_yaw, -0.805856)
+[ INFO] [1638975399.195805660]: cnt: 9, thrust diff: -7.275029, joint torque diff: -0.017285, valve torque: -8.964844
+[ INFO] [1638975399.196191471]: ex_wrench_comp_f: -2.16981 -2.27096 -1.66423 -7.05992 -3.55525 0.824532 0.733807  2.90831  4.04614  8.49593   2.9179 -3.20644
+[ INFO] [1638975399.196226812]: final thrust: 17.4949 20.7564 22.7391 16.6464
+[ INFO] [1638975399.196284727]: joint torque: (joint1_pitch, 0.0745684)(joint1_yaw, -7.01165)(joint2_pitch, -0.101713)(joint2_yaw, -4.49068)(joint3_pitch, -0.202735)(joint3_yaw, -0.808516)
+[ INFO] [1638975399.196304865]: cnt: 10, thrust diff: -7.260912, joint torque diff: 0.011654, valve torque: -8.994141
+[ INFO] [1638975399.196682570]: ex_wrench_comp_f: -2.16628 -2.26726 -1.66152 -7.04842 -3.54946 0.823189 0.732612  2.90357  4.03955  8.48209  2.91315 -3.20122
+[ INFO] [1638975399.196714803]: final thrust: 17.4971 20.7507  22.732 16.6445
+[ INFO] [1638975399.196765971]: joint torque: (joint1_pitch, 0.0737456)(joint1_yaw, -6.99718)(joint2_pitch, -0.10057)(joint2_yaw, -4.48188)(joint3_pitch, -0.202135)(joint3_yaw, -0.807186)
+[ INFO] [1638975399.196786880]: cnt: 11, thrust diff: -7.267971, joint torque diff: -0.002816, valve torque: -8.979492
+[ INFO] [1638975399.197337622]: ex_wrench_comp_f: -2.16804 -2.26911 -1.66288 -7.05417 -3.55235 0.823861 0.733209  2.90594  4.04285  8.48901  2.91553 -3.20383
+[ INFO] [1638975399.197372299]: final thrust:  17.496 20.7536 22.7356 16.6455
+[ INFO] [1638975399.197425520]: joint torque: (joint1_pitch, 0.074157)(joint1_yaw, -7.00442)(joint2_pitch, -0.101141)(joint2_yaw, -4.48628)(joint3_pitch, -0.202435)(joint3_yaw, -0.807851)
+[ INFO] [1638975399.197445660]: cnt: 12, thrust diff: -7.264441, joint torque diff: 0.004419, valve torque: -8.986816
+[ INFO] [1638975399.197983734]: ex_wrench_comp_f: -2.16716 -2.26818  -1.6622  -7.0513 -3.55091 0.823525 0.732911  2.90475   4.0412  8.48555  2.91434 -3.20252
+[ INFO] [1638975399.198017797]: final thrust: 17.4966 20.7521 22.7338  16.645
+[ INFO] [1638975399.198073927]: joint torque: (joint1_pitch, 0.0739513)(joint1_yaw, -7.0008)(joint2_pitch, -0.100856)(joint2_yaw, -4.48408)(joint3_pitch, -0.202285)(joint3_yaw, -0.807518)
+[ INFO] [1638975399.198098139]: max turn torque at end effector is -8.983154
