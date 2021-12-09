@@ -626,9 +626,31 @@ cnt: 9000, angles: 1.12274,1.27952,0.31073,torque: -13.1982
 
 
 
-joints: 1.56996, 1.5708, 0.689222, 1.5708, 0.404878, 1.5708
+
+joints: 1.56996, 1.5708, 0.689222, 1.5708, 0.404878, 1.5708 @side valve
 [ INFO] [1639034566.528811614]: rotate average torque: -10.719857, [-6.934204, -15.796509]
+@upward valve: -14.786682
 
-joints: 1.570796, 1.570796, 0, 1.570796, 0, 1.570796
+joints: 1.570796, 1.570796, 0, 1.570796, 0, 1.570796  @side valve
 [ INFO] [1639034747.360641096]: rotate average torque: -11.347685, [-7.269287, -17.589111]
+@upward valve: -15.739746
 
+joints: 1.5698, 1.5708, -0.0445081, 1.5708, 0.0864018, 1.5708 @side valve
+[ INFO] [1639047221.733778861]: rotate average torque: -11.397913, [-7.331543, -17.570801]
+@upward valve:  -14.763794
+
+
+
+[ WARN] [1639036393.018487746]: The root link root has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[ WARN] [1639036393.032659538]: The root link root has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+cnt: 1000, angles: 1.28175,-0.180334,-0.818207,torque: -9.01337; torque threshold: 2; thrust threshold: 30
+cnt: 2000, angles: 1.46412,0.690448,0.236732,torque: -8.18161; torque threshold: 2; thrust threshold: 30
+cnt: 3000, angles: 1.46052,-0.502519,0.0841388,torque: -9.34158; torque threshold: 2; thrust threshold: 30
+cnt: 4000, angles: 1.35193,-0.181739,-0.0776635,torque: -9.24545; torque threshold: 2; thrust threshold: 30
+cnt: 5000, angles: 1.4472,-7.67728e-05,0.262866,torque: -9.15344; torque threshold: 2; thrust threshold: 30
+cnt: 6000, angles: 1.45622,0.0818534,0.216215,torque: -9.57184; torque threshold: 2; thrust threshold: 30
+cnt: 7000, angles: 1.44344,0.00619567,0.0867188,torque: -9.87854; torque threshold: 2; thrust threshold: 30
+
+cnt: 8000, angles: 1.44879,0.00137875,0.170591,torque: -9.89548; torque threshold: 2; thrust threshold: 30
+cnt: 9000, angles: 1.44525,0.00259831,0.173002,torque: -9.89365; torque threshold: 2; thrust threshold: 30
+[ INFO] [1639036547.691529036]: NLOPT: 154651[ms], max torque: 11.3056; joints: 1.5698, 1.5708, -0.0445081, 1.5708, 0.0864018, 1.5708, 

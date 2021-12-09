@@ -23,8 +23,9 @@
     <!-- stopper type -->
     <rosparam param="joint_angles">[1.570796, 1.570796, 0, 1.570796, 0, 1.570796]</rosparam>
     <!-- <rosparam param="joint_angles">[1.570796, 1.570796, 1.570796, 1.570796, 1.570796, 0]</rosparam> -->
-    <!-- <rosparam param="joint_angles">[1.56996, 1.5708, 0.689222, 1.5708, 0.404878, 1.5708]</rosparam> -->
+    <rosparam param="joint_angles">[1.56996, 1.5708, 0.689222, 1.5708, 0.404878, 1.5708]</rosparam>
     <!-- <rosparam param="joint_angles">[1.33385, 1.5708, -1.54425, 1.5708, 1.00985, 1.5708]</rosparam> -->
+    <!-- <rosparam param="joint_angles">[1.5698, 1.5708, -0.0445081, 1.5708, 0.0864018, 1.5708]</rosparam> -->
 
     <!-- non stopper L shape -->
     <!-- <rosparam param="joint_angles">[1.570796, 0, 0, 0, 0, 0]</rosparam> -->

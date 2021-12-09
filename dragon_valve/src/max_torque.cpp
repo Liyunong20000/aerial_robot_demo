@@ -49,7 +49,25 @@ namespace
     for(int i = 0; i < planner->active_joint_.size(); i++)
       joint_state.position.at(planner->active_joint_.at(i)) = x.at(i);
 
-    double torque = planner->maxValveTorque(planner->robot_model_, planner->root_rot_, joint_state, planner->max_joint_torque_, planner->max_thrust_);
+    double ave_torque = 0;
+
+    double r,p,y; planner->root_rot_.GetRPY(r,p,y);
+
+    if(fabs(fabs(p) - M_PI/2) > 0.02)
+      {
+        for(r = 0; r < 2 * M_PI ; r+=M_PI/2)
+          {
+            KDL::Rotation root_rot = KDL::Rotation::EulerZYX(y, p, r);
+
+            double torque = planner->maxValveTorque(planner->robot_model_, root_rot, joint_state, planner->max_joint_torque_, planner->max_thrust_);
+            ave_torque += torque;
+          }
+        ave_torque /= 4;
+      }
+    else
+      {
+        ave_torque = planner->maxValveTorque(planner->robot_model_, planner->root_rot_, joint_state, planner->max_joint_torque_, planner->max_thrust_);
+      }
 
     cnt++;
     if(cnt % 1000 == 0)
@@ -58,13 +76,13 @@ namespace
         ss << "cnt: " << cnt;
         ss << ", angles: ";
         for(auto v : x) ss << v << ",";
-        ss << "torque: " << torque;
+        ss << "torque: " << ave_torque;
         ss << "; torque threshold: " << planner->max_joint_torque_;
         ss << "; thrust threshold: " << planner->max_thrust_;
         std::cout << ss.str() << std::endl;
       }
 
-    return fabs(torque);
+    return fabs(ave_torque);
   }
 }
 
