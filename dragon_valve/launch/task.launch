@@ -9,7 +9,9 @@
   <arg name="valve_pitch_angle" default="0" doc="the diction of the valve normal axis in gazebo model" />
   <arg name="valve_friction" default="1.0" doc="the friction of valve in gazebo model"/>
   <arg name="debug" default="false" doc="debug mode with valve, only check the trajectory following performance "/>
-
+  <arg name="valve_x" default="3" />
+  <arg name="valve_y" default="1" />
+  <arg name="valve_yaw" default="3.64" />
 
   <!-- <include file="$(find dragon_valve)/launch/include/dragon_bringup.launch" > -->
   <!--   <arg name="real_machine" value="$(arg real_machine)" /> -->
@@ -27,7 +29,7 @@
 
   <group if="$(eval arg('simulation') and not arg('real_machine'))">
     <param name="valve/robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf valve_pitch_angle:=$(arg valve_pitch_angle) valve_friction:=$(arg valve_friction) no_collision:=$(arg debug)" />
-    <node pkg="gazebo_ros" type="spawn_model" name="valve_spawn" args="-param valve/robot_description -urdf -x 3 -y 1 -z 0 -Y 3.64 -model valve" />
+    <node pkg="gazebo_ros" type="spawn_model" name="valve_spawn" args="-param valve/robot_description -urdf -x $(arg valve_x) -y $(arg valve_y) -z 0 -Y $(arg valve_yaw) -model valve" />
     <node pkg="topic_tools" type="transform" name="topic_transform" args="/valve/odom /valve/mocap/pose geometry_msgs/PoseStamped 'geometry_msgs.msg.PoseStamped(header=m.header,pose=m.pose.pose)' --import geometry_msgs nav_msgs"  launch-prefix="bash -c 'sleep 3; $0 $@' "/>
     <!-- <node pkg="rostopic" type="rostopic" name="valve_pose" args="pub -r 10 /valve/mocap/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: base_link}, pose: {position: {x: 2.0, y: 1.0, z: 0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, x: 0.0}}}'" if="$(arg debug)"/> -->
   </group>
@@ -36,6 +38,6 @@
     <param name="robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf valve_pitch_angle:=$(arg valve_pitch_angle) valve_friction:=$(arg valve_friction) no_collision:=$(arg debug)" />
   </node >
   <node name="$(anon robot_state_publisher)" pkg="robot_state_publisher" type="state_publisher" ns="valve" />
-  <node pkg="tf" type="static_transform_publisher" name="valve_tf_broadcaster" args="3 1 0 3.64 0 0 world main_pipe 50" />
+  <node pkg="tf" type="static_transform_publisher" name="valve_tf_broadcaster" args="$(arg valve_x) $(arg valve_y) 0 $(arg valve_yaw) 0 0 world main_pipe 50" />
 
 </launch>
