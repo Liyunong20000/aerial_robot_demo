@@ -32,4 +32,10 @@
     <!-- <node pkg="rostopic" type="rostopic" name="valve_pose" args="pub -r 10 /valve/mocap/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: base_link}, pose: {position: {x: 2.0, y: 1.0, z: 0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, x: 0.0}}}'" if="$(arg debug)"/> -->
   </group>
 
+  <node name="$(anon joint_state_publisher_gui)" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" ns="valve">
+    <param name="robot_description" command="$(find xacro)/xacro.py $(find dragon_valve)/urdf/valve.urdf valve_pitch_angle:=$(arg valve_pitch_angle) valve_friction:=$(arg valve_friction) no_collision:=$(arg debug)" />
+  </node >
+  <node name="$(anon robot_state_publisher)" pkg="robot_state_publisher" type="state_publisher" ns="valve" />
+  <node pkg="tf" type="static_transform_publisher" name="valve_tf_broadcaster" args="3 1 0 3.64 0 0 world main_pipe 50" />
+
 </launch>
