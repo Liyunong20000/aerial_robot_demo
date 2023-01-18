@@ -23,10 +23,9 @@ class Task2State(smach.State):
         self.task_start_sub = rospy.Subscriber('/task_start', Empty, self.taskStartCallback)
 
         self.robot = robot
-        self.task_start = False
+        self.task_start = True
 
         #ros params
-        self.simulation = rospy.get_param('/simulation')
         self.skip_takeoff = rospy.get_param('~skip_takeoff', False)
         self.skip_approach_pick_area = rospy.get_param('~skip_approach_pick_area', False)
         self.skip_scan_pick_area = rospy.get_param('~skip_scan_pick_area', False)
@@ -114,33 +113,6 @@ class ApproachPickArea(Task2State):
         if self.skip_approach_pick_area:
             return 'succeeded'
 
-        #enable alt sensor, disable plane detection
-        if not self.simulation:
-            try:
-                req = std_srvs.srv.SetBoolRequest()
-                req.data = True
-                res = self.alt_sensor_service_client(req)
-
-                if res is not None:
-                    rospy.logwarn("Enable alt sensor")
-                else:
-                    rospy.logerr("Failed to enable alt sensor")
-
-            except rospy.ServiceException as e:
-                rospy.logerr("Service call failed: %s", e)
-
-            try:
-                req = std_srvs.srv.SetBoolRequest()
-                req.data = False
-                res = self.plane_detection_service_client(req)
-
-                if res is not None:
-                    rospy.logwarn("Disable plane detection")
-                else:
-                    rospy.logerr("Failed to disable place detection")
-
-            except rospy.ServiceException as e:
-                rospy.logerr("Service call failed: %s", e)
 
         target_uav_yaw = self.global_object_yaw - self.grasping_yaw_in_fc
         self.robot.goPosWaitConvergence('global', self.global_lookdown_pos_gps, None, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
@@ -494,7 +466,7 @@ class Grasp(Task2State):
 
         self.robot.openJoint()
         self.robot.grasp()
-        rospy.sleep(1);
+        rospy.sleep(8);
         joint_state = self.robot.getJointState()
         joint_torque = []
         joint_torque.append(joint_state.effort[joint_state.name.index('joint1')])
@@ -511,30 +483,6 @@ class Grasp(Task2State):
             if self.stop_if_grasp_failed:
                 rospy.signal_shutdown("finish state machine")
                 rospy.sleep(100)
-
-        #reset realsense odom
-        if not self.simulation:
-            rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
-
-            #this process is no longer necessary after realsense v2.29.0
-            #cmd = "rosrun mbzirc2020_task2_common reset_vo.sh"
-            #subprocess.Popen(cmd.split())
-
-            #just call reset
-            try:
-                req = std_srvs.srv.EmptyRequest()
-                res = self.realsense_reset_service_client(req)
-
-                if res is not None:
-                    rospy.logwarn("Reset realsense")
-                else:
-                    rospy.logerr("Failed to reset realsense")
-
-            except rospy.ServiceException as e:
-                rospy.logerr("Service call failed: %s", e)
-
-            rospy.logerr("WARNING!! THE ROBOT WILL TAKE OFF AFTER 10 SEC")
-            rospy.sleep(10)
 
         rospy.logwarn(self.__class__.__name__ + ": takeoff")
         self.robot.setCameraJointAngle(np.pi / 2)
@@ -554,48 +502,7 @@ class ApproachPlaceArea(Task2State):
         if self.skip_approach_place_area:
             return 'succeeded'
 
-        if self.simulation:
-            client = rospy.ServiceProxy('/gazebo/apply_body_wrench', ApplyBodyWrench)
-            req = ApplyBodyWrenchRequest()
-            req.body_name = 'hydrus::root'
-            req.wrench.force.z = 3
-            req.duration.nsecs = 300000000
-            try:
-                res = client(req)
-            except rospy.ServiceException as e:
-                print("Service call failed: {}".format(e))
-
         self.robot.goPosWaitConvergence('global', None, self.place_lookdown_height, None, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-
-        #enable plane detection, disable alt sensor
-        if not self.simulation:
-
-            try:
-                req = std_srvs.srv.SetBoolRequest()
-                req.data = True
-                res = self.plane_detection_service_client(req)
-
-                if res is not None:
-                    rospy.logwarn("Enable plane detection")
-                else:
-                    rospy.logerr("Failed to enable place detection")
-
-            except rospy.ServiceException as e:
-                rospy.logerr("Service call failed: %s", e)
-
-            try:
-                req = std_srvs.srv.SetBoolRequest()
-                req.data = False
-                res = self.alt_sensor_service_client(req)
-
-                if res is not None:
-                    rospy.logwarn("Disable alt sensor")
-                else:
-                    rospy.logerr("Failed to disable alt sensor")
-
-            except rospy.ServiceException as e:
-                rospy.logerr("Service call failed: %s", e)
-
 
         uav_target_yaw = self.global_place_channel_yaw - self.grasping_yaw_in_fc
         self.robot.goPosWaitConvergence('global', self.global_place_channel_center_pos_gps, None, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)

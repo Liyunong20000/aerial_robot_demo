@@ -1,0 +1,22 @@
+<launch>
+  <arg name="world" default="kashiwa_202009"/>
+  <arg name="robot_ns" default="hydrus"/>
+  <arg name="object_color" default="red"/>
+  <arg name="debug_scan_pick_area" default="false"/>
+  <arg name="debug_pick_visual_servoing" default="false"/>
+  <arg name="debug_grasp" default="false"/>
+  <arg name="debug_approach_place_area" default="false"/>
+  <arg name="estimate_mode" default="0"/>
+
+  <group ns="$(arg robot_ns)">
+    <include file="$(find mbzirc2020_task2_tasks)/launch/motion.launch">
+      <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
+      <arg name="object_color" value="$(arg object_color)"/>
+      <arg name="debug_scan_pick_area" value="$(arg debug_scan_pick_area)"/>
+      <arg name="debug_pick_visual_servoing" value="$(arg debug_pick_visual_servoing)"/>
+      <arg name="debug_grasp" value="$(arg debug_grasp)"/>
+      <arg name="debug_approach_place_area" value="$(arg debug_approach_place_area)"/>
+    </include>
+  </group>
+
+</launch>
