@@ -53,7 +53,7 @@ class Task2HydrusInterface(HydrusInterface):
                 else:
                     rospy.logerr("%s: Failed to disable alt sensor", self.robot_ns)
 
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             rospy.logerr("%s: Service call failed: %s", self.robot_ns, e)
 
     def enable_plane_detection(self,flag):
@@ -71,7 +71,7 @@ class Task2HydrusInterface(HydrusInterface):
                     rospy.logerr("%s: Failed to enable place detection",self.robot_ns)
                 else:
                     rospy.logerr("%s: Failed to disable place detection",self.robot_ns)
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             rospy.logerr("%s: Service call failed: %s", self.robot_ns, e)
 
     def change_ctrl_mode(self,mode):

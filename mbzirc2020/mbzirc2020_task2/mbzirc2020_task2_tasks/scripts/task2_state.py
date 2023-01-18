@@ -126,7 +126,7 @@ class ApproachPickArea(Task2State):
                 else:
                     rospy.logerr("Failed to enable alt sensor")
 
-            except rospy.ServiceException, e:
+            except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s", e)
 
             try:
@@ -139,7 +139,7 @@ class ApproachPickArea(Task2State):
                 else:
                     rospy.logerr("Failed to disable place detection")
 
-            except rospy.ServiceException, e:
+            except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s", e)
 
         target_uav_yaw = self.global_object_yaw - self.grasping_yaw_in_fc
@@ -530,7 +530,7 @@ class Grasp(Task2State):
                 else:
                     rospy.logerr("Failed to reset realsense")
 
-            except rospy.ServiceException, e:
+            except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s", e)
 
             rospy.logerr("WARNING!! THE ROBOT WILL TAKE OFF AFTER 10 SEC")
@@ -562,8 +562,8 @@ class ApproachPlaceArea(Task2State):
             req.duration.nsecs = 300000000
             try:
                 res = client(req)
-            except rospy.ServiceException, e:
-                print "Service call failed: %s"%e
+            except rospy.ServiceException as e:
+                print("Service call failed: {}".format(e))
 
         self.robot.goPosWaitConvergence('global', None, self.place_lookdown_height, None, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
 
@@ -580,7 +580,7 @@ class ApproachPlaceArea(Task2State):
                 else:
                     rospy.logerr("Failed to enable place detection")
 
-            except rospy.ServiceException, e:
+            except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s", e)
 
             try:
@@ -593,7 +593,7 @@ class ApproachPlaceArea(Task2State):
                 else:
                     rospy.logerr("Failed to disable alt sensor")
 
-            except rospy.ServiceException, e:
+            except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s", e)
 
 

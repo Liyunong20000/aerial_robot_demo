@@ -12,7 +12,7 @@ from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from spinal.msg import Gps
 from std_srvs.srv import SetBool, SetBoolRequest
-from gps_utils import *
+from .gps_utils import *
 
 class HydrusInterface:
     def __init__(self, robot_ns="",debug_view = False):
@@ -135,8 +135,8 @@ class HydrusInterface:
         req.data = state
         try:
             self.set_joint_torque_client_(req)
-        except rospy.ServiceException, e:
-            print "Service call failed: %s"%e
+        except rospy.ServiceException as e:
+            print("Service call failed: {}".format(e))
 
     def getJointState(self):
         return self.joint_state_
@@ -418,5 +418,5 @@ class HydrusInterface:
             req.inertia = inertia
 
             self.add_extra_module_client_(req)
-        except rospy.ServiceException, e:
-            print "Service call failed: %s"%e
+        except rospy.ServiceException as e:
+            print("Service call failed: {}".format(e))
