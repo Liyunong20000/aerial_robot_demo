@@ -5,7 +5,7 @@ from mbzirc2020_common.hydrus_interface import *
 from task2_hydrus_interface import Task2HydrusInterface
 from sensor_msgs.msg import JointState
 import numpy as np
-from geometry_msgs.msg import Transform, Inertia, PoseArray, Quaternion, PoseStamped, Pose
+from geometry_msgs.msg import Transform, Inertia, PoseArray, Quaternion, PoseStamped, Pose, Vector3Stamped
 import tf.transformations as tft
 import tf2_ros
 import ros_numpy
@@ -201,6 +201,10 @@ class PickVisualServoing(Task2State):
         self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
         self.object_pose = PoseArray()
 
+        self.object_global_pos_pub = rospy.Publisher('~apporach/object/global_pos', Vector3Stamped, queue_size = 1)
+        self.object_local_pos_pub = rospy.Publisher('~apporach/object/local_pos', Vector3Stamped, queue_size = 1)
+
+
     def objectPoseCallback(self, msg):
         if len(msg.poses) != 0:
             self.object_pose = msg
@@ -258,6 +262,41 @@ class PickVisualServoing(Task2State):
                 rospy.logerr("%s: succeed to find valid object x: %f, y: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1])
                 #rospy.logerr("prev_x: %f, prev_y: %f", prev_object_x, prev_object_y)
 
+                try:
+                    baselink_trans = self.robot.getTF('hydrus/fc')
+                    baselink_trans = ros_numpy.numpify(baselink_trans.transform)
+                    baselink_global_pos = tft.translation_from_matrix(baselink_trans)
+                except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                    rospy.logerr(self.__class__.__name__ + ": cannot find baselink tf")
+                    return 'failed'
+
+
+
+                cam_yaw = tft.euler_from_matrix(cam_trans)[2]
+                cam_pos = tft.translation_from_matrix(cam_trans)
+                level_cam_worldcoords = tft.concatenate_matrices(tft.translation_matrix(cam_pos),
+                                                                 tft.euler_matrix(0, 0, cam_yaw + numpy.pi/2))
+                object_pos_in_lev_cam_frame = tft.translation_from_matrix(
+                    tft.concatenate_matrices(tft.inverse_matrix(level_cam_worldcoords),
+                                             target_object_coords))
+
+
+                local_pos_msg = Vector3Stamped()
+                local_pos_msg.header.stamp = self.object_pose.header.stamp
+                local_pos_msg.vector.x = object_pos_in_lev_cam_frame[0]
+                local_pos_msg.vector.y = object_pos_in_lev_cam_frame[1]
+                local_pos_msg.vector.z = object_pos_in_lev_cam_frame[2]
+                self.object_local_pos_pub.publish(local_pos_msg)
+
+                global_pos_msg = Vector3Stamped()
+                global_pos_msg.header.stamp = self.object_pose.header.stamp
+                global_pos_msg.header.frame_id = '/world'
+                global_pos_msg.vector.x = object_global_pos[0]
+                global_pos_msg.vector.y = object_global_pos[1]
+                global_pos_msg.vector.z = object_global_pos[2]
+                self.object_global_pos_pub.publish(global_pos_msg)
+
+
                 object_global_x_axis = target_object_coords[0:3, 0]
                 object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
                 new_object_global_rot = tft.euler_matrix(0, 0, object_global_yaw)
@@ -291,7 +330,8 @@ class Grasp(Task2State):
         self.add_object_model_func = add_object_model_func
         self.object_bbox_sub = rospy.Subscriber('cluster_decomposer/boxes', BoundingBoxArray, self.objectBBoxCallback)
         self.object_bbox = None
-        self.object_center_pub = rospy.Publisher('~target_pose', PoseStamped, queue_size = 1)
+        self.object_global_pos_pub = rospy.Publisher('~grasp/object/global_pos', Vector3Stamped, queue_size = 1)
+        self.object_local_pos_pub = rospy.Publisher('~grasp/object/local_pos', Vector3Stamped, queue_size = 1)
 
         #moving average filter
         self.filter_buffer = []
@@ -416,15 +456,17 @@ class Grasp(Task2State):
                 bbox_center_world_pos = tft.translation_from_matrix(bbox_center_world_coords)
                 prev_object_x, prev_object_y = bbox_center_world_pos[0], bbox_center_world_pos[1]
 
-                object_center_coords = tft.concatenate_matrices(bbox_center_coords, tft.translation_matrix([-target_object_bbox.dimensions.x / 2 + self.object_length / 2, 0, target_object_bbox.dimensions.z / 2]))
-                object_center_worldcoords = tft.concatenate_matrices(cam_trans, object_center_coords)
-                object_center_msg = PoseStamped()
-                object_center_msg.header.stamp = self.object_bbox.header.stamp
-                object_center_msg.header.frame_id = '/world'
-                object_center_msg.pose = ros_numpy.msgify(Pose, object_center_worldcoords)
-                self.object_center_pub.publish(object_center_msg) #for debug
+                try:
+                    baselink_trans = self.robot.getTF('hydrus/fc')
+                    baselink_trans = ros_numpy.numpify(baselink_trans.transform)
+                    baselink_global_pos = tft.translation_from_matrix(baselink_trans)
+                except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                    rospy.logerr(self.__class__.__name__ + ": cannot find baselink tf")
+                    return 'failed'
 
                 #set camera angle
+                object_center_coords = tft.concatenate_matrices(bbox_center_coords, tft.translation_matrix([-target_object_bbox.dimensions.x / 2 + self.object_length / 2, 0, target_object_bbox.dimensions.z / 2]))
+                object_center_worldcoords = tft.concatenate_matrices(cam_trans, object_center_coords)
                 baselink_worldcoords = ros_numpy.numpify(self.robot.getBaselinkOdom().pose.pose)
                 cam_worldcoords = tft.concatenate_matrices(baselink_worldcoords, baselink2cam_trans)
                 object_coords_in_cam_frame = tft.concatenate_matrices(tft.inverse_matrix(cam_worldcoords), object_center_worldcoords)
@@ -440,6 +482,34 @@ class Grasp(Task2State):
                 self.robot.setCameraJointAngle(filtered_cam_angle, time=0)
                 #rospy.logwarn("%f", cam_angle)
 
+
+                cam_yaw = tft.euler_from_matrix(cam_worldcoords)[2]
+                cam_pos = tft.translation_from_matrix(cam_worldcoords)
+                level_cam_worldcoords = tft.concatenate_matrices(tft.translation_matrix(cam_pos),
+                                                                 tft.euler_matrix(0, 0, cam_yaw + numpy.pi/2))
+                object_pos_in_lev_cam_frame = tft.translation_from_matrix(
+                    tft.concatenate_matrices(tft.inverse_matrix(level_cam_worldcoords),
+                                             object_center_worldcoords))
+                object_pos_in_worldcoords = tft.translation_from_matrix(object_center_worldcoords)
+
+
+                local_pos_msg = Vector3Stamped()
+                local_pos_msg.header.stamp = self.object_bbox.header.stamp
+                local_pos_msg.vector.x = object_pos_in_lev_cam_frame[0]
+                local_pos_msg.vector.y = object_pos_in_lev_cam_frame[1]
+                local_pos_msg.vector.z = object_pos_in_lev_cam_frame[2]
+                self.object_local_pos_pub.publish(local_pos_msg)
+
+                global_pos_msg = Vector3Stamped()
+                global_pos_msg.header.stamp = self.object_bbox.header.stamp
+                global_pos_msg.header.frame_id = '/world'
+                global_pos_msg.vector.x = object_pos_in_worldcoords[0]
+                global_pos_msg.vector.y = object_pos_in_worldcoords[1]
+                global_pos_msg.vector.z = object_pos_in_worldcoords[2]
+                self.object_global_pos_pub.publish(global_pos_msg)
+
+
+
                 #calc uav target
                 if object2baselink_waypoints:
                     object2baselink_trans = object2baselink_waypoints.pop(0)
@@ -450,6 +520,7 @@ class Grasp(Task2State):
                     uav_pos = self.robot.getBaselinkPos()
                     rospy.logwarn(" %s: uav pos: [%f, %f, %f]", self.__class__.__name__, uav_pos[0], uav_pos[1], uav_pos[2])
                     self.robot.goPos('global', uav_target_pos[0:2], uav_target_pos[2], None)
+
                 else:
                     break
 
