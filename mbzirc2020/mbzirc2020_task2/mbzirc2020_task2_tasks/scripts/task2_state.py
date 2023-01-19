@@ -395,13 +395,13 @@ class Grasp(Task2State):
                     rospy.logerr(self.__class__.__name__ + ": cannot find camera tf")
                     return 'failed'
 
-                rospy.logerr("prev_x: %f, prev_y: %f", prev_object_x, prev_object_y)
+                rospy.logerr("object previous xy pos [%f, %f]", prev_object_x, prev_object_y)
 
-                for obj in self.object_bbox.boxes:
+                for i, obj in enumerate(self.object_bbox.boxes):
                     object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(obj.pose))
                     object_global_pos = tft.translation_from_matrix(object_global_coords)
                     distance = (prev_object_x - object_global_pos[0]) ** 2 + (prev_object_y - object_global_pos[1]) ** 2
-                    rospy.logwarn("%f", distance)
+                    rospy.loginfo("candidate obj %d, distance to prev target object: %f", i, distance)
                     if distance < min_distance:
                         min_distance = distance
                         target_object_bbox = obj
@@ -446,7 +446,9 @@ class Grasp(Task2State):
                     uav_target_coords = tft.concatenate_matrices(object_center_worldcoords, object2baselink_trans)
                     uav_target_pos = tft.translation_from_matrix(uav_target_coords)
                     uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
-                    rospy.logwarn("%s: uav target x: %f, y: %f, z: %f, yaw: %f", self.__class__.__name__, uav_target_pos[0], uav_target_pos[1], uav_target_pos[2], uav_target_yaw)
+                    rospy.logwarn("%s: uav target pos: [%f, %f, %f], yaw: %f", self.__class__.__name__, uav_target_pos[0], uav_target_pos[1], uav_target_pos[2], uav_target_yaw)
+                    uav_pos = self.robot.getBaselinkPos()
+                    rospy.logwarn(" %s: uav pos: [%f, %f, %f]", self.__class__.__name__, uav_pos[0], uav_pos[1], uav_pos[2])
                     self.robot.goPos('global', uav_target_pos[0:2], uav_target_pos[2], None)
                 else:
                     break
