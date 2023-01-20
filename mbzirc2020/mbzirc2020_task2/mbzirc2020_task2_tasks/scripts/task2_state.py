@@ -493,21 +493,20 @@ class Grasp(Task2State):
                 object_pos_in_worldcoords = tft.translation_from_matrix(object_center_worldcoords)
 
 
-                local_pos_msg = Vector3Stamped()
-                local_pos_msg.header.stamp = self.object_bbox.header.stamp
-                local_pos_msg.vector.x = object_pos_in_lev_cam_frame[0]
-                local_pos_msg.vector.y = object_pos_in_lev_cam_frame[1]
-                local_pos_msg.vector.z = object_pos_in_lev_cam_frame[2]
-                self.object_local_pos_pub.publish(local_pos_msg)
+                # local_pos_msg = Vector3Stamped()
+                # local_pos_msg.header.stamp = self.object_bbox.header.stamp
+                # local_pos_msg.vector.x = object_pos_in_lev_cam_frame[0]
+                # local_pos_msg.vector.y = object_pos_in_lev_cam_frame[1]
+                # local_pos_msg.vector.z = object_pos_in_lev_cam_frame[2]
+                # self.object_local_pos_pub.publish(local_pos_msg)
 
-                global_pos_msg = Vector3Stamped()
-                global_pos_msg.header.stamp = self.object_bbox.header.stamp
-                global_pos_msg.header.frame_id = '/world'
-                global_pos_msg.vector.x = object_pos_in_worldcoords[0]
-                global_pos_msg.vector.y = object_pos_in_worldcoords[1]
-                global_pos_msg.vector.z = object_pos_in_worldcoords[2]
-                self.object_global_pos_pub.publish(global_pos_msg)
-
+                # global_pos_msg = Vector3Stamped()
+                # global_pos_msg.header.stamp = self.object_bbox.header.stamp
+                # global_pos_msg.header.frame_id = '/world'
+                # global_pos_msg.vector.x = object_pos_in_worldcoords[0]
+                # global_pos_msg.vector.y = object_pos_in_worldcoords[1]
+                # global_pos_msg.vector.z = object_pos_in_worldcoords[2]
+                # self.object_global_pos_pub.publish(global_pos_msg)
 
 
                 #calc uav target

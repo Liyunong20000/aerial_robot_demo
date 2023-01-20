@@ -19,4 +19,8 @@
     </include>
   </group>
 
+  <node name="state_machine_monitor" pkg="mbzirc2020_task2_tasks" type="state_machine_monitor.py" >
+    <remap from="/hydrus/task2_smach_server/smach/container_status" to="/hydrus/task2_smach_server/smach/container_status_orig"/>
+    </node>
+
 </launch>
